@@ -1,0 +1,51 @@
+{
+    "version": "1.0",
+    "title": "与Rin的聊天记录",
+    "date": "1919年8月10日",
+    "avatar_receive": "./image/avatar/Rinlit.jpg",
+    "avatar_send": "./image/avatar/Aris.jpg", 
+    "sender_name": "Aris",
+    "receiver_name": "Rinlit",
+    "messages": [
+        {
+            "type": "received",
+            "text": "这是一条消息",
+            "time": "09:30"
+        },
+        {
+            "type": "received",
+            "text": "这是第二条消息",
+            "time": "09:30"
+        },
+        {
+            "type": "received",
+            "text": "🥵🥵🥵",
+            "time": "09:31"
+        },
+        {
+            "type": "sent",
+            "text": "这是自己的第一条消息",
+            "time": "09:32"
+        },
+        {
+            "type": "sent",
+            "text": "这是自己的第二条消息",
+            "time": "09:32"
+        },
+        {
+            "type": "sent",
+            "text": "This is a verrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrry long test message.",
+            "time": "09:32"
+        },
+        {
+            "type": "received",
+            "text": "[stickers]Coming soon...",
+            "time": "09:32"
+        },
+        {
+            "type": "received",
+            "text": "？？？？",
+            "time": "09:32"
+        }
+    ]
+} 

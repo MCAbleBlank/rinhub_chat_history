@@ -1,0 +1,52 @@
+{
+    "version": "2.1",
+    "title": "这是聊天记录的标题",
+    "date": "YYYY年MM月DD日 这是聊天记录的日期",
+    "participants": {
+        "example": {
+            "nick_name": "另一位发送者的昵称，尽量简短",
+            "avatar": "头像图片的位置 ./path/to/avatar.png" 
+        },
+        "user1": {
+            "nick_name": "user1",
+            "avatar": "./path/to/avatar1.png"
+        },
+        "user2": {
+            "nick_name": "user2",
+            "avatar": "./path/to/avatar2.png"
+        }
+    },
+    "messages": [
+        {
+            "id": "example",
+            "sender": "发送者的昵称，与上方设定的nick_name",
+            "content": {
+                "image": "./path/to/image.png 如果type为image或者sticker，则填入图片文件位置",
+                "text": "Example text. 如果type为text，则填入文字",
+                "sticker": "./path/to/sticker.png 如果type为sticker，则填入表情包文件位置",
+                "quote": "0 引用的消息的id",
+                "↑↑": "以上的种类允许为image | text | sticker | quote 这四种 注意，每条消息只能有一条引用，并且ID必须是在这条消息之前的消息，引用信息永远会被渲染在消息气泡内的最上方 sticker在每条消息只能存在一个，并且这条消息只能有sticker除quote以外的这一个内容 image和text的顺序决定了它们的显示顺序 "
+            },
+            "time": "HH:MM:SS"
+        },
+        {
+            "id": "1",
+            "sender": "user1",
+            "content": {
+                "image": "./path/to/image.png 如果type为image或者sticker，则填入图片文件位置",
+                "text": "这是一条测试消息"
+            },
+            "time": "11:45:14"
+        },
+        {
+            "id": "2",
+            "sender": "user2",
+            "content": {
+                "quote": "1",
+                "sticker": "./path/to/sticker.png 如果type为sticker，则填入表情包文件位置"
+            },
+            "time": "11:45:15"
+        }
+    ]
+}
+
