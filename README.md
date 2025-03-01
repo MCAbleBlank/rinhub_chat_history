@@ -1,3 +1,7 @@
+> [!IMPORTANT]
+> 
+> 本项目和这个README都还在完善之中
+
 # rinhub_chat_history
 一个Telegram风格的聊天记录展示网页     
 
