@@ -25,7 +25,7 @@
             "id": "1",
             "sender": "user1",
             "content": {
-                "image": "./image/avatar/RinLit.jpg",
+                "image": "./image/avatar/Rinlit.jpg",
                 "text": "这是一条测试消息"
             },
             "time": "11:45:14"
@@ -36,7 +36,7 @@
             "content": {
                 "text": "这是一条测试消息",
                 "quote": "1",
-                "image": "./image/avatar/RinLit.jpg"
+                "image": "./image/avatar/Rinlit.jpg"
             },
             "time": "11:45:14"
         },
@@ -79,7 +79,7 @@
             "sender": "user2",
             "content": {
                 "sticker": "./image/stickers/杂鱼.png",
-                "image": "./image/avatar/RinLit.jpg"
+                "image": "./image/avatar/Rinlit.jpg"
             },
             "time": "11:45:14"
         },

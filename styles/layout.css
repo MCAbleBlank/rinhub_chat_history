@@ -155,7 +155,6 @@
 
 .chat-record-item {
     padding: 10px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     cursor: pointer;
     transition: background-color 0.2s ease;
 }
