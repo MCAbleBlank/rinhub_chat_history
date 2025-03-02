@@ -7,6 +7,7 @@
     height: 100%;
     background-color: rgba(0, 0, 0, 0.9);
     z-index: 1000;
+    opacity: 0;
 }
 
 .image-viewer.active {
@@ -14,6 +15,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    opacity: 1;
 }
 
 .viewer-toolbar {
@@ -27,6 +29,11 @@
     display: flex;
     gap: 10px;
     align-items: center;
+    opacity: 0;
+}
+
+.image-viewer.active .viewer-toolbar {
+    opacity: 1;
 }
 
 .zoom-button,
@@ -42,7 +49,7 @@
 
 .zoom-button:hover,
 .close-button:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.2);
 }
 
 #scaleText {
@@ -57,8 +64,14 @@
     max-height: 90vh;
     object-fit: contain;
     cursor: grab;
+    opacity: 0;
+}
+
+.image-viewer.active .viewer-image {
+    opacity: 1;
 }
 
 .viewer-image.dragging {
     cursor: grabbing;
-} 
+    transition: none;
+}

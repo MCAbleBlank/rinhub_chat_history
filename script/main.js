@@ -68,8 +68,14 @@ class ViewRenderer {
             const recordDiv = document.createElement('div');
             recordDiv.className = 'chat-record-item';
             recordDiv.innerHTML = `
-                <div class="record-title">${record.title}</div>
-                <div class="record-date">${record.date}</div>
+                ${record.icon ? 
+                    `<div class="record-icon"><img src="${record.icon}" alt="${record.title}"></div>` : 
+                    `<div class="record-icon default">@</div>`
+                }
+                <div class="record-content">
+                    <div class="record-title">${record.title}</div>
+                    <div class="record-date">${record.date}</div>
+                </div>
             `;
             recordDiv.addEventListener('click', () => {
                 ChatController.loadNewChat(record.file);

@@ -166,10 +166,49 @@
     padding: 12px;
     border-radius: 8px;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: background-color 0.2s ease, transform 0.3s ease, opacity 0.3s ease;
     margin-bottom: 8px;
+    transform: translateX(-100%);
+    opacity: 0;
 }
 
+.side-menu.active .chat-record-item {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+/* 侧边栏关闭时的动画效果 */
+.side-menu:not(.active) .chat-record-item {
+    transform: translateX(-100%);
+    opacity: 0;
+    transition-delay: 0s !important;
+}
+.side-menu.active .chat-record-item {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+/* 为每个聊天记录项添加递增的延迟 */
+:root {
+    --base-delay: 0.1s;
+    --delay-increment: 0.1s;
+    --max-delay: 1s;
+}
+
+.chat-record-item {
+    transition-delay: min(calc(var(--base-delay) + (var(--delay-increment) * (var(--n, 0)))), var(--max-delay));
+}
+
+.chat-record-item:nth-child(1) { --n: 0; }
+.chat-record-item:nth-child(2) { --n: 1; }
+.chat-record-item:nth-child(3) { --n: 2; }
+.chat-record-item:nth-child(4) { --n: 3; }
+.chat-record-item:nth-child(5) { --n: 4; }
+.chat-record-item:nth-child(6) { --n: 5; }
+.chat-record-item:nth-child(7) { --n: 6; }
+.chat-record-item:nth-child(8) { --n: 7; }
+.chat-record-item:nth-child(9) { --n: 8; }
+.chat-record-item:nth-child(n+10) { --n: 9; }
 .chat-record-item:hover {
     background-color: rgba(255, 255, 255, 0.1);
 }

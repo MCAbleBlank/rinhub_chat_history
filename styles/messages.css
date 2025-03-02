@@ -8,6 +8,16 @@
     margin: 1px 0;
     padding: 7px 12px;
     align-self: flex-start;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: messageAppear 0.3s ease forwards;
+}
+
+@keyframes messageAppear {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .text-container {
