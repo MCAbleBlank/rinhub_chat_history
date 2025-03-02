@@ -38,66 +38,76 @@
 }
 
 .identity-select {
-    padding: 8px 12px 8px 12px;
-    font-size: 14px;
-    color: white;
-    background-color: rgba(255, 255, 255, 0.2);
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
     position: relative;
-    padding-right: 30px;
+    cursor: pointer;
+    width: 120px;
     user-select: none;
 }
 
-.identity-select:hover {
-    background-color: rgba(255, 255, 255, 0.404);
+.selected-text {
+    display: block;
+    padding: 8px 12px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 14px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-/* 下拉箭头 */
-.identity-selector::after {
-    content: '▼';
-    font-size: 12px;
-    color: white;
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    pointer-events: none;
-    opacity: 0.8;
-}
-
-/* 下拉选项容器 */
 .dropdown-options {
-    display: none;
     position: absolute;
     top: 100%;
-    left: 0;
     right: 0;
-    margin-top: 4px;
-    background-color: rgba(33, 33, 33, 0.95);
-    border-radius: 6px;
+    width: 100%;
+    max-height: 0;
     overflow: hidden;
-    z-index: 1000;
+    background-color: #333;
+    border-radius: 8px;
+    margin-top: 5px;
+    transition: max-height 0.3s ease;
+    z-index: 100;
 }
 
 .identity-select.active .dropdown-options {
-    display: block;
+    max-height: 200px;
+    overflow-y: auto;
 }
 
-/* 下拉选项 */
 .dropdown-option {
     padding: 8px 12px;
-    color: white;
-    cursor: pointer;
+    color: #fff;
+    font-size: 14px;
+    transition: background-color 0.2s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.dropdown-option:hover {
+.dropdown-option:hover,
+.dropdown-option.selected {
     background-color: rgba(255, 255, 255, 0.1);
 }
 
-.dropdown-option.selected {
-    background-color: rgba(255, 255, 255, 0.2);
+/* 响应式调整 */
+@media screen and (min-width: 768px) {
+    .identity-select {
+        width: 150px;
+    }
+}
+
+@media screen and (min-width: 1440px) {
+    .identity-select {
+        width: 180px;
+    }
+    
+    .selected-text,
+    .dropdown-option {
+        font-size: 16px;
+        padding: 10px 14px;
+    }
 }
 
 /* 菜单图标 */
