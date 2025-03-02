@@ -129,11 +129,6 @@
     color: #000000;
 }
 
-.message-content.error {
-    background-color: #ff4444 !important;
-    color: #ffffff !important;
-}
-
 .sent .message-content {
     background-color: #9773de;
     color: #fff;
@@ -229,4 +224,34 @@
     margin: 0;
     max-width: 180px;
     max-height: 180px;
+}
+
+/* 添加居中显示的错误消息样式 */
+.message.error-centered {
+    justify-content: center;
+    margin: 10px 0;
+}
+
+.message.error-centered .message-content {
+    background-color: rgba(255, 59, 59, 0.276); /* 淡红色背景 */
+    /* border: 1px solid rgba(255, 59, 59, 0.3);*/
+    color: #ff3b3b; /* 红色文字 */
+    max-width: 80%;
+    text-align: center;
+    backdrop-filter: blur(3px) saturate(180%);
+    -webkit-backdrop-filter: blur(3px) saturate(180%);
+    padding: 8px 12px;
+    border-radius: 18px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* 错误消息的文本容器 */
+.message.error-centered .text-container {
+    width: 100%;
+}
+
+/* 错误消息的文本 */
+.message.error-centered .text {
+    font-weight: 500;
+    padding: 4px 0;
 }
