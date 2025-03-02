@@ -28,7 +28,7 @@
                 "image": "./image/avatar/Rinlit.jpg",
                 "text": "这是一条测试消息"
             },
-            "time": "11:45:14"
+            "time": "HH:MM:SS"
         },
         {
             "id": "2",
@@ -38,7 +38,7 @@
                 "quote": "1",
                 "image": "./image/avatar/Rinlit.jpg"
             },
-            "time": "11:45:14"
+            "time": "HH:MM:SS"
         },
         {
             "id": "3",
@@ -47,7 +47,7 @@
                 "quote": "1",
                 "sticker": "./image/stickers/杂鱼.png"
             },
-            "time": "11:45:15"
+            "time": "HH:MM:SS"
         },
         {
             "id": "4",
@@ -56,7 +56,16 @@
                 "text": "This is a verrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrry long test message.",
                 "quote": "3"
             },
-            "time": "11:45:14"
+            "time": "HH:MM:SS"
+        },
+        {
+            "id": "4",
+            "sender": "user3",
+            "content": {
+                "text": "这是一条非常的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的测试消息",
+                "quote": "3"
+            },
+            "time": "HH:MM:SS"
         },
         {
             "id": "5",
@@ -64,7 +73,7 @@
             "content": {
                 "quote": "4"
             },
-            "time": "11:45:14"
+            "time": "HH:MM:SS"
         },
         {
             "id": "6",
@@ -72,7 +81,7 @@
             "content": {
                 "quote": "7"
             },
-            "time": "11:45:14"
+            "time": "HH:MM:SS"
         },
         {
             "id": "7",
@@ -81,7 +90,7 @@
                 "sticker": "./image/stickers/杂鱼.png",
                 "image": "./image/avatar/Rinlit.jpg"
             },
-            "time": "11:45:14"
+            "time": "HH:MM:SS"
         },
         {
             "id": "8",
@@ -89,7 +98,7 @@
             "content": {
                 "text": "以上两条是故意出错的"
             },
-            "time": "11:45:14"
+            "time": "HH:MM:SS"
         }
     ]
 }
