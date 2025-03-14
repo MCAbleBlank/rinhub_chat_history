@@ -1,0 +1,105 @@
+{
+    "version": "2.1",
+    "title": "Title 标题",
+    "date": "YYYY年MM月DD日",
+    "participants": {
+        "user1": {
+            "nick_name": "user1",
+            "avatar": "./image/avatar/default.png"
+        },
+        "user2": {
+            "nick_name": "user2",
+            "avatar": "./image/avatar/default.png"
+        },
+        "user3": {
+            "nick_name": "user3",
+            "avatar": "./image/avatar/default.png"
+        },
+        "user4": {
+            "nick_name": "user4",
+            "avatar": "./image/avatar/default.png"
+        }
+    },
+    "messages": [
+        {
+            "id": "1",
+            "sender": "user1",
+            "content": {
+                "image": "./image/avatar/Rinlit.jpg",
+                "text": "这是一条测试消息"
+            },
+            "time": "HH:MM:SS"
+        },
+        {
+            "id": "2",
+            "sender": "user1",
+            "content": {
+                "text": "这是一条测试消息",
+                "quote": "1",
+                "image": "./image/avatar/Rinlit.jpg"
+            },
+            "time": "HH:MM:SS"
+        },
+        {
+            "id": "3",
+            "sender": "user2",
+            "content": {
+                "quote": "1",
+                "sticker": "./image/stickers/杂鱼.png"
+            },
+            "time": "HH:MM:SS"
+        },
+        {
+            "id": "4",
+            "sender": "user3",
+            "content": {
+                "text": "This is a verrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrry long test message.",
+                "quote": "3"
+            },
+            "time": "HH:MM:SS"
+        },
+        {
+            "id": "4",
+            "sender": "user3",
+            "content": {
+                "text": "这是一条非常的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的的测试消息",
+                "quote": "3"
+            },
+            "time": "HH:MM:SS"
+        },
+        {
+            "id": "5",
+            "sender": "user2",
+            "content": {
+                "quote": "4"
+            },
+            "time": "HH:MM:SS"
+        },
+        {
+            "id": "6",
+            "sender": "user2",
+            "content": {
+                "quote": "7"
+            },
+            "time": "HH:MM:SS"
+        },
+        {
+            "id": "7",
+            "sender": "user2",
+            "content": {
+                "sticker": "./image/stickers/杂鱼.png",
+                "image": "./image/avatar/Rinlit.jpg"
+            },
+            "time": "HH:MM:SS"
+        },
+        {
+            "id": "8",
+            "sender": "user4",
+            "content": {
+                "text": "以上两条是故意出错的"
+            },
+            "time": "HH:MM:SS"
+        }
+    ]
+}
+
