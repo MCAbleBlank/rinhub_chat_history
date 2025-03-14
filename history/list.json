@@ -13,7 +13,7 @@
             "date": "2025年02月07日"
         },
         {
-            "file": "test2.1.json",
+            "file": "./version/test2.1.json",
             "title": "Example v2.1",
             "icon": "./image/avatar/default.png",
             "date": "1919年08月10日"
