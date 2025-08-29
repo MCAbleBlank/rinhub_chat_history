@@ -11,6 +11,10 @@
     opacity: 0;
     transform: translateY(20px);
     animation: messageAppear 0.3s ease forwards;
+    background-color: rgba(255, 255, 255, 0.15); /* 半透明背景 */
+    backdrop-filter: blur(5px); /* 玻璃模糊效果 */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 阴影 */
+    border-radius: 12px; /* 默认圆角 */
 }
 
 @keyframes messageAppear {
@@ -135,12 +139,14 @@
 
 /* 消息颜色和时间戳颜色 */
 .received .message-content {
-    background-color: #efefef;
-    color: #000000;
+    background-color: rgba(255, 255, 255, 0.3); /* 半透明背景 */
+    border: 2px solid rgba(255, 255, 255, 0.356); /* 边框 */
+    color: #ffffff;
 }
 
 .sent .message-content {
-    background-color: #9773de;
+    background-color: rgba(151, 115, 222, 0.2); /* 半透明背景 */
+    border: 2px solid rgba(151, 115, 222, 0.356); /* 边框 */
     color: #fff;
 }
 
@@ -150,7 +156,7 @@
 }
 
 .received .message-time {
-    color: rgba(0, 0, 0, 0.7);
+    color: rgba(255, 255, 255, 0.776);
 }
 
 /* 连续消息样式 */
@@ -190,13 +196,13 @@
 /* 引用样式 */
 .quote-container {
     padding: 8px;
-    background-color: rgba(0, 0, 0, 0.05);
+    background-color: rgba(0, 0, 0, 0.15);
     border-radius: 8px;
     margin-bottom: 4px;
 }
 
 .sent .quote-container {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.125);
 }
 
 .quote-sender {
@@ -243,8 +249,8 @@
 }
 
 .message.error-centered .message-content {
-    background-color: rgba(255, 59, 59, 0.276); /* 淡红色背景 */
-    /* border: 1px solid rgba(255, 59, 59, 0.3);*/
+    background-color: rgba(255, 59, 59, 0.276); 
+    border: 2px solid rgba(255, 59, 59, 0.276); /* 边框 */
     color: #ff3b3b; /* 红色文字 */
     max-width: 80%;
     text-align: center;

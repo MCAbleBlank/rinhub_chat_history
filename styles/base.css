@@ -16,7 +16,7 @@ body {
     overflow-y: hidden;
     display: flex;
     flex-direction: column;
-    background-image: url('../image/bg/telegram_color.png');
+    background-image: url('../image/bg/city.png'); /*这里是背景*/
     background-size: cover;
     background-repeat: repeat;
     background-position: center;
