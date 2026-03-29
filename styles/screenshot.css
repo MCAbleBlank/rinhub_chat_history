@@ -1,0 +1,597 @@
+/* ========================================
+   Screenshot - 截图功能
+   ======================================== */
+
+/* ===== 选择模式按钮 ===== */
+.select-mode-btn {
+    position: absolute;
+    right: 140px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--bg-hover);
+    border: none;
+    border-radius: var(--radius-md);
+    padding: var(--spacing-sm);
+    cursor: pointer;
+    color: var(--color-text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-normal);
+}
+
+.select-mode-btn:hover {
+    background: var(--bg-hover-light);
+}
+
+.select-mode-btn.active {
+    background: rgba(151, 115, 222, 0.5);
+    box-shadow: 0 0 10px rgba(151, 115, 222, 0.5);
+}
+
+@media screen and (min-width: 768px) {
+    .select-mode-btn {
+        right: 170px;
+    }
+}
+
+@media screen and (min-width: 1440px) {
+    .select-mode-btn {
+        right: 200px;
+        padding: 10px;
+    }
+
+    .select-mode-btn svg {
+        width: var(--icon-size-md);
+        height: var(--icon-size-md);
+    }
+}
+
+/* ===== 底部工具栏 ===== */
+.screenshot-toolbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(33, 33, 33, 0.95);
+    backdrop-filter: var(--blur-heavy);
+    -webkit-backdrop-filter: var(--blur-heavy);
+    padding: var(--spacing-md) var(--spacing-xl);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: var(--z-modal);
+    transform: translateY(100%);
+    transition: transform var(--transition-normal);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.screenshot-toolbar.active {
+    transform: translateY(0);
+}
+
+.toolbar-left .selected-count {
+    color: var(--color-text-muted);
+    font-size: var(--font-md);
+}
+
+.toolbar-left #selectedCount {
+    color: var(--color-primary);
+    font-weight: 600;
+}
+
+.toolbar-right {
+    display: flex;
+    gap: 10px;
+}
+
+.toolbar-btn {
+    background: var(--bg-hover);
+    border: none;
+    border-radius: var(--radius-md);
+    padding: 10px var(--spacing-lg);
+    color: var(--color-text);
+    font-size: var(--font-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.toolbar-btn:hover {
+    background: var(--bg-hover-light);
+}
+
+.toolbar-btn.secondary {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--color-text-dim);
+}
+
+.toolbar-btn.secondary:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: var(--color-text);
+}
+
+.toolbar-btn.primary {
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+    font-weight: 500;
+}
+
+.toolbar-btn.primary:hover {
+    background: linear-gradient(135deg, var(--color-primary-light), var(--color-primary));
+    box-shadow: 0 4px 12px rgba(151, 115, 222, 0.4);
+}
+
+/* ===== 选择模式下的消息样式 ===== */
+.chat-messages.select-mode .message:not(.error-centered) {
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.chat-messages.select-mode .message:not(.error-centered):hover .message-content {
+    box-shadow: 0 0 0 2px rgba(151, 115, 222, 0.5);
+}
+
+.message.selected-for-screenshot .message-content {
+    box-shadow: 0 0 0 3px rgba(151, 115, 222, 0.8) !important;
+}
+
+.message.selected-for-screenshot .message-content::after {
+    content: '✓';
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: var(--icon-size-sm);
+    height: var(--icon-size-sm);
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+    color: var(--color-text);
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-sm);
+    font-weight: bold;
+    z-index: 10;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.message.received.selected-for-screenshot .message-content::after {
+    right: auto;
+    left: -10px;
+}
+
+/* ===== 截图渲染容器 ===== */
+.screenshot-render-container {
+    position: relative;
+    padding: var(--spacing-xl);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 100px;
+    overflow: hidden;
+}
+
+.screenshot-render-container::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-color: var(--bg-overlay);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.screenshot-render-container>* {
+    position: relative;
+    z-index: 1;
+}
+
+.screenshot-header {
+    text-align: center;
+    margin-bottom: var(--spacing-xl);
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.screenshot-title {
+    font-size: var(--font-xl);
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: var(--spacing-xs);
+}
+
+.screenshot-date {
+    font-size: 13px;
+    color: var(--color-text-dim);
+}
+
+/* ===== 截图容器内的消息样式 ===== */
+.screenshot-render-container .message {
+    display: flex !important;
+    align-items: flex-start !important;
+    margin: 0 0 4px 0 !important;
+    padding: 0 !important;
+    position: relative !important;
+}
+
+.screenshot-render-container .message.received {
+    justify-content: flex-start !important;
+    flex-direction: row !important;
+}
+
+.screenshot-render-container .message.sent {
+    justify-content: flex-end !important;
+    flex-direction: row !important;
+}
+
+.screenshot-render-container .message.last,
+.screenshot-render-container .message.single {
+    margin-bottom: 10px !important;
+}
+
+.screenshot-render-container .message:first-of-type {
+    margin-top: 0 !important;
+}
+
+.screenshot-render-container .message:last-of-type {
+    margin-bottom: 0 !important;
+}
+
+/* 头像 */
+.screenshot-render-container .avatar {
+    flex-shrink: 0 !important;
+    width: 40px !important;
+    height: 40px !important;
+    margin: 0 var(--spacing-sm) 0 0 !important;
+    display: block !important;
+}
+
+.screenshot-render-container .avatar img {
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: var(--radius-full) !important;
+    object-fit: cover !important;
+    display: block !important;
+}
+
+.screenshot-render-container .message.middle .avatar,
+.screenshot-render-container .message.last .avatar {
+    display: none !important;
+}
+
+/* 消息内容 */
+.screenshot-render-container .message-content {
+    max-width: 280px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 2px !important;
+    padding: 7px var(--spacing-md) !important;
+    border-radius: var(--radius-lg) !important;
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+    margin: 0 !important;
+    align-self: auto !important;
+    flex-shrink: 1 !important;
+    min-width: 0 !important;
+}
+
+.screenshot-render-container .message.received .message-content {
+    background-color: var(--msg-received-bg) !important;
+    border: 2px solid var(--msg-received-border) !important;
+    color: var(--color-text) !important;
+}
+
+.screenshot-render-container .message.sent .message-content {
+    background-color: var(--msg-sent-bg) !important;
+    border: 2px solid var(--msg-sent-border) !important;
+    color: var(--color-text) !important;
+}
+
+.screenshot-render-container .message.received.middle .message-content,
+.screenshot-render-container .message.received.last .message-content {
+    margin-left: 48px !important;
+}
+
+/* 发送消息的圆角样式 */
+.screenshot-render-container .message.sent.single .message-content {
+    border-radius: var(--radius-lg) !important;
+}
+
+.screenshot-render-container .message.sent.first .message-content {
+    border-radius: var(--radius-lg) var(--radius-lg) var(--radius-sm) var(--radius-lg) !important;
+}
+
+.screenshot-render-container .message.sent.middle .message-content {
+    border-radius: var(--radius-lg) var(--radius-sm) var(--radius-sm) var(--radius-lg) !important;
+}
+
+.screenshot-render-container .message.sent.last .message-content {
+    border-radius: var(--radius-lg) var(--radius-sm) var(--radius-lg) var(--radius-lg) !important;
+}
+
+/* 接收消息的圆角样式 */
+.screenshot-render-container .message.received.single .message-content {
+    border-radius: var(--radius-lg) !important;
+}
+
+.screenshot-render-container .message.received.first .message-content {
+    border-radius: var(--radius-lg) var(--radius-lg) var(--radius-lg) var(--radius-sm) !important;
+}
+
+.screenshot-render-container .message.received.middle .message-content {
+    border-radius: var(--radius-sm) var(--radius-lg) var(--radius-lg) var(--radius-sm) !important;
+}
+
+.screenshot-render-container .message.received.last .message-content {
+    border-radius: var(--radius-sm) var(--radius-lg) var(--radius-lg) var(--radius-lg) !important;
+}
+
+/* 图片和表情 */
+.screenshot-render-container .image {
+    display: block !important;
+}
+
+.screenshot-render-container .image img {
+    display: block !important;
+    max-width: 100% !important;
+    border-radius: var(--radius-md) !important;
+    margin: 0 !important;
+}
+
+.screenshot-render-container .sticker {
+    display: block !important;
+}
+
+.screenshot-render-container .sticker img {
+    display: block !important;
+    max-width: 120px !important;
+    max-height: 120px !important;
+    margin: 0 !important;
+}
+
+/* 文本 */
+.screenshot-render-container .text-container {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    width: 100% !important;
+    gap: var(--spacing-sm) !important;
+}
+
+.screenshot-render-container .text {
+    word-wrap: break-word !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+    white-space: normal !important;
+    font-size: var(--font-md) !important;
+    line-height: 1.4 !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    max-width: 100% !important;
+}
+
+.screenshot-render-container .sender {
+    font-size: var(--font-md) !important;
+    font-weight: 700 !important;
+    margin-bottom: 1px !important;
+    color: var(--color-accent) !important;
+}
+
+.screenshot-render-container .message-time {
+    font-size: var(--font-xs) !important;
+    line-height: 1.2 !important;
+    opacity: 0.7 !important;
+    text-align: right !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* 引用 */
+.screenshot-render-container .quote-container {
+    padding: var(--spacing-sm) !important;
+    background-color: rgba(0, 0, 0, 0.15) !important;
+    border-radius: var(--radius-md) !important;
+    margin-bottom: var(--spacing-xs) !important;
+}
+
+.screenshot-render-container .quote-sender {
+    font-size: var(--font-sm) !important;
+    font-weight: 600 !important;
+    margin-bottom: 2px !important;
+    color: var(--color-accent) !important;
+}
+
+.screenshot-render-container .quote-content {
+    font-size: 13px !important;
+    opacity: 0.8 !important;
+}
+
+/* ===== 预览模态框 ===== */
+.screenshot-preview-modal {
+    position: fixed;
+    inset: 0;
+    background: var(--bg-overlay-heavy);
+    z-index: var(--z-modal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-xl);
+    animation: fadeIn var(--transition-normal);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.preview-content {
+    background: rgba(40, 40, 40, 0.98);
+    border-radius: var(--radius-xl);
+    max-width: 90vw;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: var(--shadow-xl);
+    animation: scaleIn var(--transition-normal);
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.preview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-lg) var(--spacing-xl);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--color-text);
+    font-size: var(--font-lg);
+    font-weight: 500;
+}
+
+.preview-close {
+    background: none;
+    border: none;
+    color: var(--color-text-dim);
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+}
+
+.preview-close:hover {
+    background: var(--bg-hover);
+    color: var(--color-text);
+}
+
+.preview-body {
+    flex: 1;
+    overflow: auto;
+    padding: var(--spacing-xl);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.preview-body img {
+    max-width: 100%;
+    max-height: 60vh;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+}
+
+.preview-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: var(--spacing-lg) var(--spacing-xl);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ===== 加载状态 ===== */
+.screenshot-loader {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: var(--z-modal);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    color: var(--color-text);
+    opacity: 0;
+    visibility: hidden;
+    transition: all var(--transition-normal);
+}
+
+.screenshot-loader.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.loader-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    border-top-color: var(--color-primary);
+    border-radius: var(--radius-full);
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ===== Toast 提示 ===== */
+.screenshot-toast {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: rgba(40, 40, 40, 0.95);
+    color: var(--color-text);
+    padding: var(--spacing-md) 24px;
+    border-radius: var(--radius-md);
+    font-size: var(--font-md);
+    z-index: var(--z-toast);
+    opacity: 0;
+    transition: all var(--transition-normal);
+    box-shadow: var(--shadow-md);
+}
+
+.screenshot-toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* ===== 响应式 ===== */
+@media screen and (max-width: 480px) {
+    .screenshot-toolbar {
+        flex-direction: column;
+        gap: 10px;
+        padding: 10px 15px;
+    }
+
+    .toolbar-right {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .toolbar-btn {
+        flex: 1;
+        padding: var(--spacing-sm) 10px;
+        font-size: 13px;
+    }
+
+    .preview-footer {
+        flex-direction: column;
+    }
+
+    .preview-footer .toolbar-btn {
+        width: 100%;
+    }
+}

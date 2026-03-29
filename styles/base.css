@@ -1,8 +1,14 @@
+/* ========================================
+   Base - 基础样式
+   ======================================== */
+
+/* 自定义字体 */
 @font-face {
     font-family: 'Microsoft YaHei UI';
     src: url('../fonts/Microsoft YaHei UI.ttc') format('truetype');
 }
 
+/* 全局重置 */
 * {
     margin: 0;
     padding: 0;
@@ -10,25 +16,39 @@
     font-family: 'Microsoft YaHei UI', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
+html {
+    background-color: transparent;
+}
+
+/* 页面主体 */
 body {
     position: relative;
     height: 100vh;
     overflow-y: hidden;
     display: flex;
     flex-direction: column;
-    background-image: url('../image/bg/city.png'); /*这里是背景*/
-    background-size: cover;
-    background-repeat: repeat;
-    background-position: center;
-    background-attachment: fixed;
 }
 
-/* 背景遮罩 */
+/* 背景图片层 */
 body::before {
     content: '';
-    position: absolute;
+    position: fixed;
+    inset: -20px;
+    /* 扩大一点以避免模糊白边 */
+    background-image: var(--bg-image);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    filter: blur(var(--bg-blur));
+    z-index: -1;
+}
+
+/* 背景遮罩层 */
+body::after {
+    content: '';
+    position: fixed;
     inset: 0;
-    background-color: rgba(0, 0, 0, 0.407);
+    background-color: var(--bg-overlay);
     pointer-events: none;
     z-index: 0;
 }
@@ -36,5 +56,44 @@ body::before {
 /* 主容器层级 */
 .chat-container {
     position: relative;
-    z-index: 1;
+    z-index: var(--z-base);
+}
+
+/* ===== 工具类 ===== */
+
+/* 隐藏滚动条 */
+.hide-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+/* 文本截断 */
+.text-ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 居中弹性盒 */
+.flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 玻璃态背景 */
+.glass-bg {
+    background-color: var(--bg-glass);
+    backdrop-filter: var(--blur-light);
+    -webkit-backdrop-filter: var(--blur-light);
+}
+
+.glass-bg-dark {
+    background-color: var(--bg-glass-dark);
+    backdrop-filter: var(--blur-heavy);
+    -webkit-backdrop-filter: var(--blur-heavy);
 }

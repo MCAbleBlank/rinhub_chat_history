@@ -3,9 +3,9 @@
     "title": "这是聊天记录的标题",
     "date": "YYYY年MM月DD日 这是聊天记录的日期",
     "participants": {
-        "example": {
-            "nick_name": "另一位发送者的昵称，尽量简短",
-            "avatar": "头像图片的位置 ./path/to/avatar.png" 
+        "participant_id": {
+            "nick_name": "显示的发送者的昵称",
+            "avatar": "头像图片的位置 ./path/to/avatar.png"
         },
         "user1": {
             "nick_name": "user1",
@@ -19,7 +19,7 @@
     "messages": [
         {
             "id": "example",
-            "sender": "发送者的昵称，与上方设定的nick_name",
+            "sender": "与上方设定的该发送者的participant_id一至",
             "content": {
                 "image": "./path/to/image.png 如果type为image或者sticker，则填入图片文件位置",
                 "text": "Example text. 如果type为text，则填入文字",
@@ -49,4 +49,3 @@
         }
     ]
 }
-

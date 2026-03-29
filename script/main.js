@@ -42,18 +42,27 @@ class ViewRenderer {
         const selectedText = select.querySelector('.selected-text');
         
         optionsContainer.innerHTML = '';
-        selectedText.textContent = currentUser || '选择用户';
         
-        Object.values(participants).forEach(participant => {
+        let activeNickName = currentUser;
+        if (participants[currentUser]) {
+            activeNickName = participants[currentUser].nick_name;
+        } else {
+            const p = Object.values(participants).find(p => p.nick_name === currentUser);
+            if (p) activeNickName = p.nick_name;
+        }
+        
+        selectedText.textContent = activeNickName || '选择用户';
+        
+        Object.entries(participants).forEach(([id, participant]) => {
             const option = document.createElement('div');
             option.className = 'dropdown-option';
-            if (participant.nick_name === currentUser) {
+            if (id === currentUser || participant.nick_name === currentUser) {
                 option.classList.add('selected');
             }
             option.textContent = participant.nick_name;
             option.addEventListener('click', () => {
                 selectedText.textContent = participant.nick_name;
-                ChatController.switchUserPerspective(participant.nick_name);
+                ChatController.switchUserPerspective(id);
                 select.classList.remove('active');
             });
             optionsContainer.appendChild(option);
@@ -129,12 +138,17 @@ class ChatController {
             ViewRenderer.showError(filename);
             return;
         }
+        
+        this.loadChatData(chatData, filename);
+    }
 
+    static loadChatData(chatData, filename = '') {
         state.currentChatHistory = chatData;
+        state.currentHistoryFile = filename;
         
         // 每次加载新聊天记录时，总是使用第一个参与者作为当前用户
         if (chatData.participants) {
-            state.currentUser = Object.values(chatData.participants)[0].nick_name;
+            state.currentUser = Object.keys(chatData.participants)[0];
         }
 
         ViewRenderer.updateHeader(chatData.title, chatData.date);
@@ -208,8 +222,26 @@ class MessageRenderer {
         const prevMsg = index > 0 ? messages[index - 1] : null;
         const nextMsg = index < messages.length - 1 ? messages[index + 1] : null;
         
+        // 获取发送者信息 (兼容 sender 是 participant_id 或 nick_name)
+        const getParticipantInfo = (senderData) => {
+            const participants = state.currentChatHistory.participants;
+            if (!participants) return null;
+            if (participants[senderData]) return { id: senderData, ...participants[senderData] };
+            const entry = Object.entries(participants).find(([id, p]) => p.nick_name === senderData);
+            return entry ? { id: entry[0], ...entry[1] } : null;
+        };
+
+        const senderInfo = getParticipantInfo(msg.sender);
+        const currentInfo = getParticipantInfo(currentUser);
+        
         // 确定消息类型（发送/接收）
-        const messageType = msg.sender === currentUser ? 'sent' : 'received';
+        let isSent = false;
+        if (senderInfo && currentInfo) {
+            isSent = senderInfo.id === currentInfo.id;
+        } else {
+            isSent = msg.sender === currentUser;
+        }
+        const messageType = isSent ? 'sent' : 'received';
         
         // 确定消息位置
         let position = 'single';
@@ -223,34 +255,38 @@ class MessageRenderer {
         
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${messageType} ${position}`;
+        messageDiv.setAttribute('data-sender', msg.sender);
         
         let messageHTML = '';
         
-        // 获取头像URL（从当前聊天记录的参与者信息中获取）
-        const senderInfo = Object.values(state.currentChatHistory.participants)
-            .find(p => p.nick_name === msg.sender);
-        const avatarUrl = senderInfo ? senderInfo.avatar : '';
+        // 修复：如果无头像，提供默认路径，防止生成图片时出现裂图“头像”字样
+        const avatarUrl = (senderInfo && senderInfo.avatar) ? senderInfo.avatar : './image/default_avatar.png';
+        const avatarHtml = `
+            <div class="avatar" style="flex-shrink: 0;">
+                <img src="${avatarUrl}" alt="头像" onerror="this.src='./image/default_avatar.png';">
+            </div>
+        `;
         
-        // 添加头像
+        // 添加左侧头像 (接收方)
         if (messageType === 'received' && (position === 'first' || position === 'single')) {
-            messageHTML += `
-                <div class="avatar">
-                    <img src="${avatarUrl}" alt="头像">
-                </div>
-            `;
+            messageHTML += avatarHtml;
         }
         
         // 开始构建消息内容
         messageHTML += '<div class="message-content">';
         
-        // 添加发送者名称
+        // 添加发送者名称 (展示昵称)
         if ((position === 'first' || position === 'single') && messageType === 'received') {
-            messageHTML += `<div class="sender">${msg.sender}</div>`;
+            const displayName = senderInfo ? senderInfo.nick_name : msg.sender;
+            messageHTML += `<div class="sender">${displayName}</div>`;
         }
         
         // 添加引用（如果存在）
         if (msg.content.quote) {
             const quotedMsg = messages.find(m => m.id === msg.content.quote);
+            const quotedInfo = getParticipantInfo(quotedMsg.sender);
+            const quotedName = quotedInfo ? quotedInfo.nick_name : quotedMsg.sender;
+            
             const quotedContent = quotedMsg.content.text || '图片/表情';
             const displayContent = quotedContent.length > 15 ? 
                 quotedContent.substring(0, 15) + '…' : 
@@ -258,7 +294,7 @@ class MessageRenderer {
             
             messageHTML += `
                 <div class="quote-container">
-                    <div class="quote-sender">${quotedMsg.sender}</div>
+                    <div class="quote-sender">${quotedName}</div>
                     <div class="quote-content">${displayContent}</div>
                 </div>
             `;
@@ -292,6 +328,11 @@ class MessageRenderer {
         messageHTML += `<div class="message-time">${msg.time}</div>`;
         
         messageHTML += '</div>';
+        
+        // 添加右侧头像 (发送方)
+        if (messageType === 'sent' && (position === 'first' || position === 'single')) {
+            messageHTML += avatarHtml;
+        }
         
         messageDiv.innerHTML = messageHTML;
         return messageDiv;

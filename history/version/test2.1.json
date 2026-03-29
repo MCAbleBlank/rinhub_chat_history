@@ -3,7 +3,7 @@
     "title": "Title 标题",
     "date": "YYYY年MM月DD日",
     "participants": {
-        "user1": {
+        "fuck": {
             "nick_name": "user1",
             "avatar": "./image/avatar/default.png"
         },
@@ -111,4 +111,3 @@
         }
     ]
 }
-

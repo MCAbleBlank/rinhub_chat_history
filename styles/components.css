@@ -1,0 +1,338 @@
+/* ========================================
+   Components - 组件样式
+   合并自: header.css, avatar.css, record-icon.css
+   ======================================== */
+
+/* ===== 头部导航栏 ===== */
+.chat-header {
+    position: fixed;
+    z-index: var(--z-header);
+    flex-shrink: 0;
+    padding: var(--spacing-md) 15px;
+    color: var(--color-text);
+    background-color: var(--bg-glass-dark);
+    backdrop-filter: var(--blur-heavy);
+    -webkit-backdrop-filter: var(--blur-heavy);
+    width: 100%;
+    left: 0;
+    top: 0;
+    height: var(--header-height);
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.chat-header h2 {
+    font-size: var(--font-lg);
+    margin: 0 0 2px 44px;
+    line-height: 1.2;
+}
+
+.chat-info {
+    font-size: 13px;
+    opacity: 0.8;
+    margin-left: 44px;
+    line-height: 1.2;
+}
+
+/* ===== 身份选择器 ===== */
+.identity-selector {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.identity-select {
+    position: relative;
+    cursor: pointer;
+    width: 120px;
+    user-select: none;
+}
+
+.selected-text {
+    display: block;
+    padding: var(--spacing-sm) var(--spacing-md);
+    background-color: var(--bg-hover);
+    border-radius: var(--radius-md);
+    color: var(--color-text);
+    font-size: var(--font-md);
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dropdown-options {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 100%;
+    max-height: 0;
+    overflow: hidden;
+    background-color: #333;
+    border-radius: var(--radius-md);
+    margin-top: 5px;
+    transition: max-height var(--transition-normal);
+    z-index: var(--z-dropdown);
+}
+
+.identity-select.active .dropdown-options {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.dropdown-option {
+    padding: var(--spacing-sm) var(--spacing-md);
+    color: var(--color-text);
+    font-size: var(--font-md);
+    transition: background-color var(--transition-fast);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dropdown-option:hover,
+.dropdown-option.selected {
+    background-color: var(--bg-hover);
+}
+
+/* ===== 菜单图标 ===== */
+.menu-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 20px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.menu-icon span {
+    display: block;
+    width: 100%;
+    height: 2px;
+    background-color: var(--color-text);
+    border-radius: var(--radius-xs);
+    transition: transform var(--transition-normal);
+}
+
+/* 菜单打开时的图标动画 */
+.menu-icon.active span:nth-child(1) {
+    transform: translateY(9px) rotate(45deg);
+}
+
+.menu-icon.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.menu-icon.active span:nth-child(3) {
+    transform: translateY(-9px) rotate(-45deg);
+}
+
+
+/* ===== 侧边菜单 ===== */
+.side-menu {
+    position: fixed;
+    left: calc(-1 * var(--sidebar-width));
+    top: 0;
+    width: var(--sidebar-width);
+    height: calc(100% - 60px);
+    margin-top: var(--header-height);
+    background-color: var(--bg-glass-darker);
+    backdrop-filter: var(--blur-heavy);
+    -webkit-backdrop-filter: var(--blur-heavy);
+    z-index: var(--z-sidebar);
+    transition: left var(--transition-normal);
+    /* Flex 布局以支持底部设置按钮 */
+    display: flex;
+    flex-direction: column;
+}
+
+.side-menu.active {
+    left: 0;
+}
+
+.menu-content {
+    padding: var(--spacing-xl);
+    color: var(--color-text);
+    /* 允许内容滚动，但占据剩余空间 */
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.menu-content::-webkit-scrollbar {
+    display: none;
+}
+
+/* ===== 聊天记录列表项 ===== */
+.chat-record-item {
+    display: flex;
+    align-items: center;
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: background-color var(--transition-fast),
+        transform var(--transition-normal),
+        opacity var(--transition-normal);
+    margin-bottom: var(--spacing-sm);
+    transform: translateX(-100%);
+    opacity: 0;
+}
+
+.side-menu.active .chat-record-item {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+.side-menu:not(.active) .chat-record-item {
+    transform: translateX(-100%);
+    opacity: 0;
+    transition-delay: 0s !important;
+}
+
+.chat-record-item:hover {
+    background-color: var(--bg-hover);
+}
+
+/* 列表项动画延迟 */
+.chat-record-item:nth-child(1) {
+    transition-delay: 0.1s;
+}
+
+.chat-record-item:nth-child(2) {
+    transition-delay: 0.2s;
+}
+
+.chat-record-item:nth-child(3) {
+    transition-delay: 0.3s;
+}
+
+.chat-record-item:nth-child(4) {
+    transition-delay: 0.4s;
+}
+
+.chat-record-item:nth-child(5) {
+    transition-delay: 0.5s;
+}
+
+.chat-record-item:nth-child(6) {
+    transition-delay: 0.6s;
+}
+
+.chat-record-item:nth-child(7) {
+    transition-delay: 0.7s;
+}
+
+.chat-record-item:nth-child(8) {
+    transition-delay: 0.8s;
+}
+
+.chat-record-item:nth-child(9) {
+    transition-delay: 0.9s;
+}
+
+.chat-record-item:nth-child(n+10) {
+    transition-delay: 1s;
+}
+
+/* ===== 记录图标 ===== */
+.record-icon {
+    width: var(--avatar-size);
+    height: var(--avatar-size);
+    margin-right: var(--spacing-md);
+    flex-shrink: 0;
+    border-radius: var(--radius-full);
+    overflow: hidden;
+}
+
+.record-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.record-icon.default {
+    background: linear-gradient(135deg, #252f96 0%, #6521b8 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text);
+    font-size: 20px;
+}
+
+.record-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.record-title {
+    font-size: 15px;
+    font-weight: 500;
+    margin-bottom: var(--spacing-xs);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.record-date {
+    font-size: var(--font-sm);
+    color: var(--color-text-dim);
+}
+
+/* ===== 头像 ===== */
+.avatar {
+    width: var(--avatar-size);
+    height: var(--avatar-size);
+    flex-shrink: 0;
+}
+
+.message.received .avatar {
+    margin: 0 var(--spacing-sm) 0 0;
+}
+
+.avatar img {
+    width: 100%;
+    height: 100%;
+    border-radius: var(--radius-full);
+    object-fit: cover;
+}
+
+/* 连续消息隐藏头像 */
+.message.middle .avatar,
+.message.last .avatar {
+    display: none;
+}
+
+/* ===== 响应式调整 ===== */
+@media screen and (min-width: 768px) {
+    .identity-select {
+        width: 150px;
+    }
+}
+
+@media screen and (min-width: 1440px) {
+    .identity-select {
+        width: 180px;
+    }
+
+    .selected-text,
+    .dropdown-option {
+        font-size: var(--font-lg);
+        padding: 10px 14px;
+    }
+
+    .record-title {
+        font-size: var(--font-lg);
+    }
+
+    .record-date {
+        font-size: var(--font-md);
+    }
+}

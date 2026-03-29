@@ -1,0 +1,109 @@
+/* ========================================
+   CSS Variables - 设计系统变量定义
+   ======================================== */
+
+:root {
+    /* ===== 颜色系统 ===== */
+    /* 主题色 */
+    --color-primary: #9773de;
+    --color-primary-dark: #7c5dc4;
+    --color-primary-light: #a584e6;
+    --color-accent: #2f80f1;
+    --color-error: #ff3b3b;
+
+    /* 文字颜色 */
+    --color-text: #ffffff;
+    --color-text-muted: rgba(255, 255, 255, 0.776);
+    --color-text-dim: rgba(255, 255, 255, 0.7);
+    --color-text-faint: rgba(255, 255, 255, 0.6);
+
+    /* 背景色 */
+    --bg-glass: rgba(255, 255, 255, 0.15);
+    --bg-glass-light: rgba(255, 255, 255, 0.3);
+    --bg-glass-dark: rgba(33, 33, 33, 0.7);
+    --bg-glass-darker: rgba(33, 33, 33, 0.866);
+    --bg-overlay: rgba(0, 0, 0, 0.407);
+    --bg-overlay-heavy: rgba(0, 0, 0, 0.85);
+    --bg-hover: rgba(255, 255, 255, 0.1);
+    --bg-hover-light: rgba(255, 255, 255, 0.2);
+
+    /* 背景设置 */
+    --bg-image: url('../image/bg/city.png');
+    --bg-blur: 0px;
+
+    /* 消息颜色 */
+    --msg-received-bg: rgba(255, 255, 255, 0.3);
+    --msg-received-border: rgba(255, 255, 255, 0.356);
+    --msg-sent-bg: rgba(151, 115, 222, 0.2);
+    --msg-sent-border: rgba(151, 115, 222, 0.356);
+    --msg-error-bg: rgba(255, 59, 59, 0.276);
+    --msg-error-border: rgba(255, 59, 59, 0.276);
+
+    /* ===== 间距系统 ===== */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 12px;
+    --spacing-lg: 16px;
+    --spacing-xl: 20px;
+    --spacing-2xl: 30px;
+
+    /* ===== 圆角系统 ===== */
+    --radius-xs: 2px;
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --radius-full: 50%;
+
+    /* ===== 字体大小 ===== */
+    --font-xs: 10px;
+    --font-sm: 12px;
+    --font-md: 14px;
+    --font-lg: 16px;
+    --font-xl: 18px;
+
+    /* ===== 动画时间 ===== */
+    --transition-fast: 0.2s ease;
+    --transition-normal: 0.3s ease;
+
+    /* ===== 模糊效果 ===== */
+    --blur-light: blur(5px);
+    --blur-heavy: blur(10px) saturate(180%);
+
+    /* ===== 阴影 ===== */
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.1);
+    --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.2);
+    --shadow-lg: 0 4px 20px rgba(0, 0, 0, 0.3);
+    --shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.5);
+
+    /* ===== 尺寸 ===== */
+    --header-height: 70px;
+    --avatar-size: 42px;
+    --icon-size-sm: 20px;
+    --icon-size-md: 24px;
+    --sidebar-width: 280px;
+    --max-content-width: 1440px;
+
+    /* ===== Z-Index 层级 ===== */
+    --z-base: 1;
+    --z-header: 2;
+    --z-dropdown: 100;
+    --z-sidebar: 1001;
+    --z-modal: 2000;
+    --z-toast: 3000;
+
+    /* ===== 动画延迟变量 (用于列表项) ===== */
+    --stagger-base: 0.1s;
+    --stagger-increment: 0.1s;
+    --stagger-max: 1s;
+}
+
+/* ===== 大屏适配 ===== */
+@media screen and (min-width: 1440px) {
+    :root {
+        --font-md: 16px;
+        --font-lg: 18px;
+        --avatar-size: 48px;
+    }
+}

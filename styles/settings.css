@@ -1,0 +1,240 @@
+/* ========================================
+   Settings - 设置面板样式
+   ======================================== */
+
+/* 侧边栏设置按钮 */
+.settings-btn-container {
+    padding: var(--spacing-md) var(--spacing-xl);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: auto;
+    /* 推到底部 */
+}
+
+.settings-btn {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    color: var(--color-text);
+    font-size: var(--font-md);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all var(--transition-fast);
+}
+
+.settings-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* 设置模态框 */
+.settings-modal {
+    position: fixed;
+    inset: 0;
+    background: var(--bg-overlay-heavy);
+    z-index: var(--z-modal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--transition-normal);
+}
+
+.settings-modal.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.settings-content {
+    background: rgba(40, 40, 40, 0.95);
+    backdrop-filter: var(--blur-heavy);
+    -webkit-backdrop-filter: var(--blur-heavy);
+    width: 90%;
+    max-width: 500px;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xl);
+    transform: scale(0.9);
+    transition: transform var(--transition-normal);
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.settings-modal.active .settings-content {
+    transform: scale(1);
+}
+
+.settings-header {
+    padding: var(--spacing-lg) var(--spacing-xl);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.settings-header h3 {
+    font-size: var(--font-lg);
+    font-weight: 500;
+}
+
+.close-settings {
+    background: none;
+    border: none;
+    color: var(--color-text-dim);
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-xs);
+    transition: color var(--transition-fast);
+}
+
+.close-settings:hover {
+    color: var(--color-text);
+}
+
+.settings-body {
+    padding: var(--spacing-xl);
+    overflow-y: auto;
+}
+
+/* 设置项分组 */
+.settings-group {
+    margin-bottom: var(--spacing-2xl);
+}
+
+.settings-group h4 {
+    font-size: var(--font-md);
+    color: var(--color-text-dim);
+    margin-bottom: var(--spacing-md);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* 设置项行 */
+.setting-item {
+    margin-bottom: var(--spacing-lg);
+}
+
+.setting-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-sm);
+    font-size: var(--font-md);
+}
+
+.setting-value {
+    font-size: var(--font-sm);
+    color: var(--color-text-dim);
+}
+
+/* 颜色选择器 */
+.color-picker-container {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.color-input {
+    width: 100%;
+    height: 40px;
+    border: none;
+    border-radius: var(--radius-md);
+    background: rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    padding: 2px;
+}
+
+/* 滑块 */
+.slider-container {
+    width: 100%;
+}
+
+.slider {
+    width: 100%;
+    -webkit-appearance: none;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    outline: none;
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    background: var(--color-primary);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background var(--transition-fast), transform var(--transition-fast);
+}
+
+.slider::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
+    background: var(--color-primary-light);
+}
+
+/* 文件上传 */
+.file-upload-btn {
+    display: inline-block;
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-size: var(--font-sm);
+    transition: background var(--transition-fast);
+    text-align: center;
+    width: 100%;
+    border: 1px dashed rgba(255, 255, 255, 0.3);
+}
+
+.file-upload-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.url-input {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-md);
+    padding: 8px 10px;
+    color: var(--color-text);
+    font-size: var(--font-sm);
+    margin-top: 8px;
+    outline: none;
+    transition: border-color var(--transition-fast);
+}
+
+.url-input:focus {
+    border-color: var(--color-primary);
+}
+
+/* 底部按钮 */
+.settings-footer {
+    padding: var(--spacing-lg) var(--spacing-xl);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.reset-btn {
+    background: rgba(255, 59, 59, 0.1);
+    color: #ff5c5c;
+    border: 1px solid rgba(255, 59, 59, 0.3);
+}
+
+.reset-btn:hover {
+    background: rgba(255, 59, 59, 0.2);
+}
