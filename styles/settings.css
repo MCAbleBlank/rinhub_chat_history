@@ -50,18 +50,20 @@
 }
 
 .settings-content {
-    background: rgba(40, 40, 40, 0.95);
+    background: rgba(35, 35, 35, 0.85);
     backdrop-filter: var(--blur-heavy);
     -webkit-backdrop-filter: var(--blur-heavy);
     width: 90%;
     max-width: 500px;
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-xl);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     transform: scale(0.9);
     transition: transform var(--transition-normal);
     max-height: 85vh;
     display: flex;
     flex-direction: column;
+    color: var(--color-text);
 }
 
 .settings-modal.active .settings-content {
@@ -79,6 +81,7 @@
 .settings-header h3 {
     font-size: var(--font-lg);
     font-weight: 500;
+    color: var(--color-primary-light);
 }
 
 .close-settings {
@@ -122,20 +125,28 @@
 
 /* 设置项行 */
 .setting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: var(--spacing-lg);
+    gap: var(--spacing-lg);
+}
+
+.setting-item.vertical {
+    flex-direction: column;
+    align-items: stretch;
 }
 
 .setting-label {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--spacing-sm);
+    flex-direction: column;
     font-size: var(--font-md);
 }
 
 .setting-value {
     font-size: var(--font-sm);
     color: var(--color-text-dim);
+    margin-top: 4px;
 }
 
 /* 颜色选择器 */
@@ -143,11 +154,12 @@
     display: flex;
     gap: 10px;
     align-items: center;
+    width: 60px;
 }
 
 .color-input {
     width: 100%;
-    height: 40px;
+    height: 36px;
     border: none;
     border-radius: var(--radius-md);
     background: rgba(0, 0, 0, 0.2);
@@ -157,11 +169,15 @@
 
 /* 滑块 */
 .slider-container {
-    width: 100%;
+    flex: 1;
+    max-width: 200px;
+    display: flex;
+    align-items: center;
 }
 
 .slider {
     width: 100%;
+    appearance: none;
     -webkit-appearance: none;
     height: 6px;
     background: rgba(255, 255, 255, 0.1);
@@ -170,6 +186,7 @@
 }
 
 .slider::-webkit-slider-thumb {
+    appearance: none;
     -webkit-appearance: none;
     width: 18px;
     height: 18px;
@@ -184,24 +201,7 @@
     background: var(--color-primary-light);
 }
 
-/* 文件上传 */
-.file-upload-btn {
-    display: inline-block;
-    padding: 8px 16px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    font-size: var(--font-sm);
-    transition: background var(--transition-fast);
-    text-align: center;
-    width: 100%;
-    border: 1px dashed rgba(255, 255, 255, 0.3);
-}
 
-.file-upload-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
-    border-color: rgba(255, 255, 255, 0.5);
-}
 
 .url-input {
     width: 100%;
@@ -211,7 +211,6 @@
     padding: 8px 10px;
     color: var(--color-text);
     font-size: var(--font-sm);
-    margin-top: 8px;
     outline: none;
     transition: border-color var(--transition-fast);
 }

@@ -151,9 +151,12 @@ class ScreenshotManager {
             const renderContainer = document.createElement('div');
             renderContainer.className = 'screenshot-render-container';
 
-            // 获取背景图片
-            const bgImage = getComputedStyle(document.body).backgroundImage;
-            renderContainer.style.backgroundImage = bgImage;
+            // 获取由于截图特定设置的背景色
+            const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--screenshot-bg').trim() || '#2b2d31';
+            renderContainer.style.backgroundColor = bgColor;
+            
+            // 为了避免以前留下的透明遗留问题，去掉之前的 backgroundImage 逻辑
+            renderContainer.style.backgroundImage = 'none';
 
             // 添加标题
             const titleDiv = document.createElement('div');

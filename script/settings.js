@@ -9,7 +9,8 @@ class SettingsManager {
             bgImage: "url('../image/bg/city.png')",
             bgBlur: 0,
             overlayColor: '#000000',
-            overlayOpacity: 40 // %
+            overlayOpacity: 40, // %
+            screenshotBgColor: '#2b2d31' // 默认深灰色
         };
 
         this.settings = this.loadSettings();
@@ -59,6 +60,9 @@ class SettingsManager {
         // 应用遮罩 (颜色 + 透明度合成 rgba)
         const rgba = this.hexToRgba(this.settings.overlayColor, this.settings.overlayOpacity / 100);
         root.style.setProperty('--bg-overlay', rgba);
+
+        // 应用截图背景色
+        root.style.setProperty('--screenshot-bg', this.settings.screenshotBgColor);
     }
 
     // 创建设置入口按钮
@@ -144,15 +148,25 @@ class SettingsManager {
                             </div>
                         </div>
 
-                        <div class="setting-item">
+                        <div class="setting-item vertical">
                             <div class="setting-label">
                                 <span>自定义背景图</span>
                             </div>
-                            <label class="file-upload-btn">
-                                选择本地图片
-                                <input type="file" id="bgFileInput" accept="image/*" style="display: none;">
-                            </label>
-                            <input type="text" id="bgUrlInput" class="url-input" placeholder="或输入图片 URL" value="${this.settings.bgImage.replace(/^url\(['"]?|['"]?\)$/g, '')}">
+                            <input type="text" id="bgUrlInput" class="url-input" placeholder="输入图片 URL" value="${this.settings.bgImage.replace(/^url\(['"]?|['"]?\)$/g, '')}">
+                        </div>
+                    </div>
+                    
+                    <!-- 截图设置 -->
+                    <div class="settings-group">
+                        <h4>截图设置</h4>
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <span>截图背景颜色</span>
+                                <span class="setting-value" id="screenshotBgColorValue">${this.settings.screenshotBgColor}</span>
+                            </div>
+                            <div class="color-picker-container">
+                                <input type="color" id="screenshotBgColorInput" class="color-input" value="${this.settings.screenshotBgColor}">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -182,6 +196,15 @@ class SettingsManager {
         primaryInput.oninput = (e) => {
             this.settings.primaryColor = e.target.value;
             document.getElementById('primaryColorValue').textContent = e.target.value;
+            this.applySettings();
+            this.saveSettings();
+        };
+
+        // 截图背景色
+        const screenshotBgColorInput = document.getElementById('screenshotBgColorInput');
+        screenshotBgColorInput.oninput = (e) => {
+            this.settings.screenshotBgColor = e.target.value;
+            document.getElementById('screenshotBgColorValue').textContent = e.target.value;
             this.applySettings();
             this.saveSettings();
         };
@@ -220,22 +243,6 @@ class SettingsManager {
             this.saveSettings();
         };
 
-        // 本地文件上传
-        const bgFileInput = document.getElementById('bgFileInput');
-        bgFileInput.onchange = (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    this.settings.bgImage = `url('${e.target.result}')`;
-                    document.getElementById('bgUrlInput').value = '(已选择本地图片)';
-                    this.applySettings();
-                    this.saveSettings();
-                };
-                reader.readAsDataURL(file);
-            }
-        };
-
         // 重置
         document.getElementById('resetSettings').onclick = () => {
             if (confirm('确定要恢复默认设置吗？')) {
@@ -253,6 +260,9 @@ class SettingsManager {
     updateUI() {
         document.getElementById('primaryColorInput').value = this.settings.primaryColor;
         document.getElementById('primaryColorValue').textContent = this.settings.primaryColor;
+
+        document.getElementById('screenshotBgColorInput').value = this.settings.screenshotBgColor;
+        document.getElementById('screenshotBgColorValue').textContent = this.settings.screenshotBgColor;
 
         document.getElementById('blurInput').value = this.settings.bgBlur;
         document.getElementById('blurValue').textContent = `${this.settings.bgBlur}px`;
