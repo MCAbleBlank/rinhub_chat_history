@@ -40,9 +40,10 @@ class ViewRenderer {
         const select = document.getElementById('identitySelect');
         const optionsContainer = select.querySelector('.dropdown-options');
         const selectedText = select.querySelector('.selected-text');
-        
+
         optionsContainer.innerHTML = '';
-        
+        if (!participants) return;
+
         let activeNickName = currentUser;
         if (participants[currentUser]) {
             activeNickName = participants[currentUser].nick_name;
@@ -52,7 +53,7 @@ class ViewRenderer {
         }
         
         selectedText.textContent = activeNickName || '选择用户';
-        
+
         Object.entries(participants).forEach(([id, participant]) => {
             const option = document.createElement('div');
             option.className = 'dropdown-option';
@@ -72,14 +73,14 @@ class ViewRenderer {
     static renderChatList(records) {
         const menuContent = document.querySelector('.menu-content');
         menuContent.innerHTML = '<h3 style="margin-bottom: 15px;">聊天记录列表</h3>';
-        
+
         records.forEach(record => {
             const recordDiv = document.createElement('div');
             recordDiv.className = 'chat-record-item';
             recordDiv.innerHTML = `
-                ${record.icon ? 
-                    `<div class="record-icon"><img src="${record.icon}" alt="${record.title}"></div>` : 
-                    `<div class="record-icon default">@</div>`
+                ${record.icon ?
+                    `<div class="record-icon"><img src="${record.icon}" alt="${record.title}"></div>` :
+                    `<div class="record-icon default">${record.title ? record.title.charAt(0).toUpperCase() : '@'}</div>`
                 }
                 <div class="record-content">
                     <div class="record-title">${record.title}</div>
@@ -118,6 +119,9 @@ class ViewRenderer {
                 </div>
             </div>
         `;
+        const btnEditCurrent = document.getElementById('btnEditCurrent');
+        if (btnEditCurrent) btnEditCurrent.style.display = 'none';
+
         this.updateHeader('(∪.∪ )...zzz', '');
     }
 }
@@ -133,23 +137,32 @@ class ChatController {
     static async loadNewChat(filename) {
         state.currentHistoryFile = filename;
         const chatData = await ChatLoader.loadChatHistory(filename);
-        
+
         if (!chatData) {
             ViewRenderer.showError(filename);
             return;
         }
-        
+
+        // 恢复原始设置 (如果之前是从带设置的ZIP导入并进入了预览)
+        if (window.settingsManager) {
+            window.settingsManager.restoreOriginalSettings();
+        }
+
         this.loadChatData(chatData, filename);
     }
 
     static loadChatData(chatData, filename = '') {
         state.currentChatHistory = chatData;
         state.currentHistoryFile = filename;
-        
+
         // 每次加载新聊天记录时，总是使用第一个参与者作为当前用户
         if (chatData.participants) {
             state.currentUser = Object.keys(chatData.participants)[0];
         }
+
+        // 显示“编辑当前记录”按钮
+        const btnEditCurrent = document.getElementById('btnEditCurrent');
+        if (btnEditCurrent) btnEditCurrent.style.display = 'flex';
 
         ViewRenderer.updateHeader(chatData.title, chatData.date);
         ViewRenderer.updateIdentitySelector(chatData.participants, state.currentUser);
@@ -170,13 +183,13 @@ class MessageRenderer {
     static renderMessages(messages, currentUser) {
         const messagesContainer = document.querySelector('.chat-messages');
         messagesContainer.innerHTML = '';
-        
+
         messages.forEach((msg, index) => {
             if (!this.validateMessage(msg, messages, index)) {
                 this.renderErrorMessage(messagesContainer, msg);
                 return;
             }
-            
+
             const messageElement = this.createMessageElement(msg, messages, index, currentUser);
             messagesContainer.appendChild(messageElement);
         });
@@ -221,7 +234,7 @@ class MessageRenderer {
     static createMessageElement(msg, messages, index, currentUser) {
         const prevMsg = index > 0 ? messages[index - 1] : null;
         const nextMsg = index < messages.length - 1 ? messages[index + 1] : null;
-        
+
         // 获取发送者信息 (兼容 sender 是 participant_id 或 nick_name)
         const getParticipantInfo = (senderData) => {
             const participants = state.currentChatHistory.participants;
@@ -233,7 +246,7 @@ class MessageRenderer {
 
         const senderInfo = getParticipantInfo(msg.sender);
         const currentInfo = getParticipantInfo(currentUser);
-        
+
         // 确定消息类型（发送/接收）
         let isSent = false;
         if (senderInfo && currentInfo) {
@@ -242,7 +255,7 @@ class MessageRenderer {
             isSent = msg.sender === currentUser;
         }
         const messageType = isSent ? 'sent' : 'received';
-        
+
         // 确定消息位置
         let position = 'single';
         if (prevMsg && nextMsg && msg.sender === prevMsg.sender && msg.sender === nextMsg.sender) {
@@ -252,46 +265,49 @@ class MessageRenderer {
         } else if (prevMsg && msg.sender === prevMsg.sender) {
             position = 'last';
         }
-        
+
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${messageType} ${position}`;
         messageDiv.setAttribute('data-sender', msg.sender);
-        
+
         let messageHTML = '';
-        
-        // 修复：如果无头像，提供默认路径，防止生成图片时出现裂图“头像”字样
-        const avatarUrl = (senderInfo && senderInfo.avatar) ? senderInfo.avatar : './image/default_avatar.png';
-        const avatarHtml = `
+
+        // 如果无头像，使用昵称首个字符作为头像
+        const avatarHtml = (senderInfo && senderInfo.avatar) ? `
             <div class="avatar" style="flex-shrink: 0;">
-                <img src="${avatarUrl}" alt="头像" onerror="this.src='./image/default_avatar.png';">
+                <img src="${senderInfo.avatar}" alt="头像" onerror="this.outerHTML='<div class=\\'avatar-text\\'>${(senderInfo.nick_name || msg.sender || '?').charAt(0).toUpperCase()}</div>';">
+            </div>
+        ` : `
+            <div class="avatar" style="flex-shrink: 0;">
+                <div class="avatar-text">${(senderInfo ? senderInfo.nick_name : msg.sender || '?').charAt(0).toUpperCase()}</div>
             </div>
         `;
-        
+
         // 添加左侧头像 (接收方)
         if (messageType === 'received' && (position === 'first' || position === 'single')) {
             messageHTML += avatarHtml;
         }
-        
+
         // 开始构建消息内容
         messageHTML += '<div class="message-content">';
-        
+
         // 添加发送者名称 (展示昵称)
         if ((position === 'first' || position === 'single') && messageType === 'received') {
             const displayName = senderInfo ? senderInfo.nick_name : msg.sender;
             messageHTML += `<div class="sender">${displayName}</div>`;
         }
-        
+
         // 添加引用（如果存在）
         if (msg.content.quote) {
             const quotedMsg = messages.find(m => m.id === msg.content.quote);
             const quotedInfo = getParticipantInfo(quotedMsg.sender);
             const quotedName = quotedInfo ? quotedInfo.nick_name : quotedMsg.sender;
-            
+
             const quotedContent = quotedMsg.content.text || '图片/表情';
-            const displayContent = quotedContent.length > 15 ? 
-                quotedContent.substring(0, 15) + '…' : 
+            const displayContent = quotedContent.length > 15 ?
+                quotedContent.substring(0, 15) + '…' :
                 quotedContent;
-            
+
             messageHTML += `
                 <div class="quote-container">
                     <div class="quote-sender">${quotedName}</div>
@@ -299,11 +315,11 @@ class MessageRenderer {
                 </div>
             `;
         }
-        
+
         // 添加消息内容
         messageHTML += '<div class="text-container">';
         Object.entries(msg.content).forEach(([type, value]) => {
-            switch(type) {
+            switch (type) {
                 case 'text':
                     messageHTML += `<div class="text">${value}</div>`;
                     break;
@@ -323,17 +339,17 @@ class MessageRenderer {
             }
         });
         messageHTML += '</div>';
-        
+
         // 添加时间
         messageHTML += `<div class="message-time">${msg.time}</div>`;
-        
+
         messageHTML += '</div>';
-        
+
         // 添加右侧头像 (发送方)
         if (messageType === 'sent' && (position === 'first' || position === 'single')) {
             messageHTML += avatarHtml;
         }
-        
+
         messageDiv.innerHTML = messageHTML;
         return messageDiv;
     }
@@ -370,7 +386,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 初始化菜单控制
     const menuIcon = document.getElementById('menuIcon');
     const sideMenu = document.getElementById('sideMenu');
-    
+
     menuIcon.addEventListener('click', () => {
         menuIcon.classList.toggle('active');
         sideMenu.classList.toggle('active');

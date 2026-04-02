@@ -41,6 +41,12 @@ body::before {
     background-position: center;
     filter: blur(var(--bg-blur));
     z-index: -1;
+    transition: background-image 0.5s ease, background-color 0.5s ease;
+}
+
+body.no-bg-image::before {
+    background-image: none !important;
+    background-color: var(--pure-bg-color, #1a1a1a);
 }
 
 /* 背景遮罩层 */

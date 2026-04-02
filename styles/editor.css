@@ -400,3 +400,32 @@
     padding: 10px 24px;
     border-radius: 50px;
 }
+
+.editor-checkbox-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 15px;
+    color: var(--color-text);
+    transition: all var(--transition-fast);
+    user-select: none;
+    line-height: 1;
+}
+
+.editor-checkbox-btn:hover {
+    background: rgba(255, 255, 255, 0.18);
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+.editor-checkbox-btn input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: var(--color-primary);
+    margin: 0;
+}

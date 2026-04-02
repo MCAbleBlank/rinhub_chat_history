@@ -282,14 +282,14 @@
 
 .screenshot-render-container .message.received .message-content {
     background-color: var(--msg-received-bg) !important;
-    border: 2px solid var(--msg-received-border) !important;
-    color: var(--color-text) !important;
+    border: var(--msg-border-width, 2px) solid var(--msg-received-border) !important;
+    color: var(--msg-received-color, var(--color-text)) !important;
 }
 
 .screenshot-render-container .message.sent .message-content {
     background-color: var(--msg-sent-bg) !important;
-    border: 2px solid var(--msg-sent-border) !important;
-    color: var(--color-text) !important;
+    border: var(--msg-border-width, 2px) solid var(--msg-sent-border) !important;
+    color: var(--msg-sent-color, var(--color-text)) !important;
 }
 
 .screenshot-render-container .message.received.middle .message-content,

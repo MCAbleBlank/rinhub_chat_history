@@ -18,7 +18,7 @@ class ScreenshotManager {
     loadHtml2Canvas() {
         if (!window.html2canvas) {
             const script = document.createElement('script');
-            script.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+            script.src = 'script/lib/html2canvas.min.js';
             document.head.appendChild(script);
         }
     }

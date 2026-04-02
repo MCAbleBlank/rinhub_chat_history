@@ -6,12 +6,23 @@ class SettingsManager {
     constructor() {
         this.defaults = {
             primaryColor: '#9773de',
+            useBgImage: true,
             bgImage: "url('../image/bg/city.png')",
             bgBlur: 0,
+            pureBgColor: '#1a1a1a',
             overlayColor: '#000000',
             overlayOpacity: 40, // %
-            screenshotBgColor: '#2b2d31' // 默认深灰色
+            screenshotBgColor: '#2b2d31', // 默认深灰色
+            sentMsgBg: 'rgba(151, 115, 222, 0.25)',
+            receivedMsgBg: 'rgba(255, 255, 255, 0.25)',
+            sentMsgColor: '#ffffff',
+            receivedMsgColor: '#ffffff',
+            bubbleOpacity: 25, // %
+            showBubbleBorder: true,
+            useBubbleBlur: true
         };
+
+        this.originalSettings = null; // 用于存储临时预览前的设置
 
         this.settings = this.loadSettings();
         this.init();
@@ -46,13 +57,18 @@ class SettingsManager {
         root.style.setProperty('--color-primary-dark', this.adjustColor(this.settings.primaryColor, -20));
         root.style.setProperty('--color-primary-light', this.adjustColor(this.settings.primaryColor, 20));
 
-        // 应用背景图
-        let bgImg = this.settings.bgImage;
-        // 如果不是 url() 或 data: 开头，添加 url()
-        if (!bgImg.startsWith('url(') && !bgImg.startsWith('data:')) {
-            bgImg = `url('${bgImg}')`;
+        // 应用背景
+        if (this.settings.useBgImage) {
+            document.body.classList.remove('no-bg-image');
+            let bgImg = this.settings.bgImage;
+            if (!bgImg.startsWith('url(') && !bgImg.startsWith('data:')) {
+                bgImg = `url('${bgImg}')`;
+            }
+            root.style.setProperty('--bg-image', bgImg);
+        } else {
+            document.body.classList.add('no-bg-image');
+            root.style.setProperty('--pure-bg-color', this.settings.pureBgColor);
         }
-        root.style.setProperty('--bg-image', bgImg);
 
         // 应用模糊
         root.style.setProperty('--bg-blur', `${this.settings.bgBlur}px`);
@@ -63,6 +79,50 @@ class SettingsManager {
 
         // 应用截图背景色
         root.style.setProperty('--screenshot-bg', this.settings.screenshotBgColor);
+
+        root.style.setProperty('--msg-sent-bg', this.settings.sentMsgBg);
+        root.style.setProperty('--msg-received-bg', this.settings.receivedMsgBg);
+
+        // 应用气泡文字颜色
+        root.style.setProperty('--msg-sent-color', this.settings.sentMsgColor);
+        root.style.setProperty('--msg-received-color', this.settings.receivedMsgColor);
+
+        // 应用气泡描边与模糊
+        root.style.setProperty('--msg-border-width', this.settings.showBubbleBorder ? '2px' : '0px');
+        root.style.setProperty('--msg-blur', this.settings.useBubbleBlur ? 'var(--blur-light)' : 'none');
+    }
+
+    // 加载外部预览设置 (ZIP自带设置)
+    loadRemoteSettings(remoteSettings) {
+        // 先存一份当前的设置作为备份
+        if (!this.originalSettings) {
+            this.originalSettings = JSON.parse(JSON.stringify(this.settings));
+        }
+        
+        // 合并设置
+        this.settings = { ...this.settings, ...remoteSettings };
+        this.applySettings();
+        
+        // 提示用户
+        const toast = document.createElement('div');
+        toast.className = 'screenshot-toast show';
+        toast.style.bottom = '80px';
+        toast.textContent = '已自动应用本聊天记录自带的主题设置';
+        document.body.appendChild(toast);
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+
+    // 恢复原始设置
+    restoreOriginalSettings() {
+        if (this.originalSettings) {
+            this.settings = this.originalSettings;
+            this.originalSettings = null;
+            this.applySettings();
+            this.saveSettings();
+        }
     }
 
     // 创建设置入口按钮
@@ -121,11 +181,42 @@ class SettingsManager {
                         
                         <div class="setting-item">
                             <div class="setting-label">
-                                <span>背景模糊度</span>
-                                <span class="setting-value" id="blurValue">${this.settings.bgBlur}px</span>
+                                <span>启用背景图片</span>
                             </div>
-                            <div class="slider-container">
-                                <input type="range" id="blurInput" class="slider" min="0" max="20" step="1" value="${this.settings.bgBlur}">
+                            <label class="switch">
+                                <input type="checkbox" id="useBgImageInput" ${this.settings.useBgImage ? 'checked' : ''}>
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+
+                        <div id="bgImageSettingsGroup" style="display: ${this.settings.useBgImage ? 'block' : 'none'}">
+                            <div class="setting-item">
+                                <div class="setting-label">
+                                    <span>背景模糊度</span>
+                                    <span class="setting-value" id="blurValue">${this.settings.bgBlur}px</span>
+                                </div>
+                                <div class="slider-container">
+                                    <input type="range" id="blurInput" class="slider" min="0" max="20" step="1" value="${this.settings.bgBlur}">
+                                </div>
+                            </div>
+
+                            <div class="setting-item vertical">
+                                <div class="setting-label">
+                                    <span>图片 URL</span>
+                                </div>
+                                <input type="text" id="bgUrlInput" class="url-input" placeholder="输入图片 URL" value="${this.settings.bgImage.replace(/^url\(['"]?|['"]?\)$/g, '')}">
+                            </div>
+                        </div>
+
+                        <div id="bgColorSettingsGroup" style="display: ${this.settings.useBgImage ? 'none' : 'block'}">
+                            <div class="setting-item">
+                                <div class="setting-label">
+                                    <span>背景颜色</span>
+                                    <span class="setting-value" id="pureBgColorValue">${this.settings.pureBgColor}</span>
+                                </div>
+                                <div class="color-picker-container">
+                                    <input type="color" id="pureBgColorInput" class="color-input" value="${this.settings.pureBgColor}">
+                                </div>
                             </div>
                         </div>
 
@@ -147,15 +238,74 @@ class SettingsManager {
                                 <input type="range" id="opacityInput" class="slider" min="0" max="100" step="5" value="${this.settings.overlayOpacity}">
                             </div>
                         </div>
-
-                        <div class="setting-item vertical">
-                            <div class="setting-label">
-                                <span>自定义背景图</span>
-                            </div>
-                            <input type="text" id="bgUrlInput" class="url-input" placeholder="输入图片 URL" value="${this.settings.bgImage.replace(/^url\(['"]?|['"]?\)$/g, '')}">
-                        </div>
                     </div>
                     
+                    <!-- 气泡设置 -->
+                    <div class="settings-group">
+                        <h4>消息气泡设置</h4>
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <span>视角气泡颜色 (发送方)</span>
+                                <span class="setting-value" id="sentMsgBgValue">${this.settings.sentMsgBg}</span>
+                            </div>
+                            <div class="color-picker-container">
+                                <input type="color" id="sentMsgBgInput" class="color-input" value="${this.rgbToHex(this.settings.sentMsgBg)}">
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <span>对方气泡颜色 (接收方)</span>
+                                <span class="setting-value" id="receivedMsgBgValue">${this.settings.receivedMsgBg}</span>
+                            </div>
+                            <div class="color-picker-container">
+                                <input type="color" id="receivedMsgBgInput" class="color-input" value="${this.rgbToHex(this.settings.receivedMsgBg)}">
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <span>视角文字颜色 (发送方)</span>
+                            </div>
+                            <div class="color-picker-container">
+                                <input type="color" id="sentMsgColorInput" class="color-input" value="${this.settings.sentMsgColor}">
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <span>对方文字颜色 (接收方)</span>
+                            </div>
+                            <div class="color-picker-container">
+                                <input type="color" id="receivedMsgColorInput" class="color-input" value="${this.settings.receivedMsgColor}">
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <span>气泡不透明度</span>
+                                <span class="setting-value" id="bubbleOpacityValue">${this.settings.bubbleOpacity}%</span>
+                            </div>
+                            <div class="slider-container">
+                                <input type="range" id="bubbleOpacityInput" class="slider" min="0" max="100" step="5" value="${this.settings.bubbleOpacity}">
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <span>显示气泡描边</span>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="showBubbleBorderInput" ${this.settings.showBubbleBorder ? 'checked' : ''}>
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <span>启用气泡背景模糊</span>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="useBubbleBlurInput" ${this.settings.useBubbleBlur ? 'checked' : ''}>
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
                     <!-- 截图设置 -->
                     <div class="settings-group">
                         <h4>截图设置</h4>
@@ -201,10 +351,101 @@ class SettingsManager {
         };
 
         // 截图背景色
-        const screenshotBgColorInput = document.getElementById('screenshotBgColorInput');
         screenshotBgColorInput.oninput = (e) => {
             this.settings.screenshotBgColor = e.target.value;
             document.getElementById('screenshotBgColorValue').textContent = e.target.value;
+            this.applySettings();
+            this.saveSettings();
+        };
+
+        // 视角气泡颜色
+        const sentMsgBgInput = document.getElementById('sentMsgBgInput');
+        sentMsgBgInput.oninput = (e) => {
+            const rgba = this.hexToRgba(e.target.value, this.settings.bubbleOpacity / 100);
+            this.settings.sentMsgBg = rgba;
+            document.getElementById('sentMsgBgValue').textContent = rgba;
+            this.applySettings();
+            this.saveSettings();
+        };
+
+        // 对方气泡颜色
+        const receivedMsgBgInput = document.getElementById('receivedMsgBgInput');
+        receivedMsgBgInput.oninput = (e) => {
+            const rgba = this.hexToRgba(e.target.value, this.settings.bubbleOpacity / 100);
+            this.settings.receivedMsgBg = rgba;
+            document.getElementById('receivedMsgBgValue').textContent = rgba;
+            this.applySettings();
+            this.saveSettings();
+        };
+
+        // 视角文字颜色
+        const sentMsgColorInput = document.getElementById('sentMsgColorInput');
+        sentMsgColorInput.oninput = (e) => {
+            this.settings.sentMsgColor = e.target.value;
+            this.applySettings();
+            this.saveSettings();
+        };
+
+        // 对方文字颜色
+        const receivedMsgColorInput = document.getElementById('receivedMsgColorInput');
+        receivedMsgColorInput.oninput = (e) => {
+            this.settings.receivedMsgColor = e.target.value;
+            this.applySettings();
+            this.saveSettings();
+        };
+
+        // 气泡不透明度
+        const bubbleOpacityInput = document.getElementById('bubbleOpacityInput');
+        bubbleOpacityInput.oninput = (e) => {
+            const alpha = e.target.value / 100;
+            this.settings.bubbleOpacity = e.target.value;
+            document.getElementById('bubbleOpacityValue').textContent = `${e.target.value}%`;
+            
+            // 同时更新当前已选颜色的透明度
+            const currentSentHex = this.rgbToHex(this.settings.sentMsgBg);
+            const currentReceivedHex = this.rgbToHex(this.settings.receivedMsgBg);
+            
+            this.settings.sentMsgBg = this.hexToRgba(currentSentHex, alpha);
+            this.settings.receivedMsgBg = this.hexToRgba(currentReceivedHex, alpha);
+            
+            document.getElementById('sentMsgBgValue').textContent = this.settings.sentMsgBg;
+            document.getElementById('receivedMsgBgValue').textContent = this.settings.receivedMsgBg;
+            
+            this.applySettings();
+            this.saveSettings();
+        };
+
+        // 气泡描边开关
+        const showBubbleBorderInput = document.getElementById('showBubbleBorderInput');
+        showBubbleBorderInput.onchange = (e) => {
+            this.settings.showBubbleBorder = e.target.checked;
+            this.applySettings();
+            this.saveSettings();
+        };
+
+        // 气泡模糊开关
+        const useBubbleBlurInput = document.getElementById('useBubbleBlurInput');
+        useBubbleBlurInput.onchange = (e) => {
+            this.settings.useBubbleBlur = e.target.checked;
+            this.applySettings();
+            this.saveSettings();
+        };
+
+        // 背景开关
+        const useBgImageInput = document.getElementById('useBgImageInput');
+        useBgImageInput.onchange = (e) => {
+            this.settings.useBgImage = e.target.checked;
+            document.getElementById('bgImageSettingsGroup').style.display = e.target.checked ? 'block' : 'none';
+            document.getElementById('bgColorSettingsGroup').style.display = e.target.checked ? 'none' : 'block';
+            this.applySettings();
+            this.saveSettings();
+        };
+
+        // 纯色背景
+        const pureBgColorInput = document.getElementById('pureBgColorInput');
+        pureBgColorInput.oninput = (e) => {
+            this.settings.pureBgColor = e.target.value;
+            document.getElementById('pureBgColorValue').textContent = e.target.value;
             this.applySettings();
             this.saveSettings();
         };
@@ -261,6 +502,28 @@ class SettingsManager {
         document.getElementById('primaryColorInput').value = this.settings.primaryColor;
         document.getElementById('primaryColorValue').textContent = this.settings.primaryColor;
 
+        document.getElementById('useBgImageInput').checked = this.settings.useBgImage;
+        document.getElementById('bgImageSettingsGroup').style.display = this.settings.useBgImage ? 'block' : 'none';
+        document.getElementById('bgColorSettingsGroup').style.display = this.settings.useBgImage ? 'none' : 'block';
+
+        document.getElementById('pureBgColorInput').value = this.settings.pureBgColor;
+        document.getElementById('pureBgColorValue').textContent = this.settings.pureBgColor;
+
+        document.getElementById('sentMsgBgInput').value = this.rgbToHex(this.settings.sentMsgBg);
+        document.getElementById('sentMsgBgValue').textContent = this.settings.sentMsgBg;
+
+        document.getElementById('receivedMsgBgInput').value = this.rgbToHex(this.settings.receivedMsgBg);
+        document.getElementById('receivedMsgBgValue').textContent = this.settings.receivedMsgBg;
+
+        document.getElementById('sentMsgColorInput').value = this.settings.sentMsgColor;
+        document.getElementById('receivedMsgColorInput').value = this.settings.receivedMsgColor;
+
+        document.getElementById('bubbleOpacityInput').value = this.settings.bubbleOpacity;
+        document.getElementById('bubbleOpacityValue').textContent = `${this.settings.bubbleOpacity}%`;
+
+        document.getElementById('showBubbleBorderInput').checked = this.settings.showBubbleBorder;
+        document.getElementById('useBubbleBlurInput').checked = this.settings.useBubbleBlur;
+
         document.getElementById('screenshotBgColorInput').value = this.settings.screenshotBgColor;
         document.getElementById('screenshotBgColorValue').textContent = this.settings.screenshotBgColor;
 
@@ -291,6 +554,17 @@ class SettingsManager {
         } else {
             modal.classList.remove('active');
         }
+    }
+
+    // 工具：RGB(A) 转 Hex
+    rgbToHex(rgba) {
+        if (!rgba || !rgba.startsWith('rgb')) return rgba || '#000000';
+        const matches = rgba.match(/\d+/g);
+        if (!matches || matches.length < 3) return '#000000';
+        const r = parseInt(matches[0]);
+        const g = parseInt(matches[1]);
+        const b = parseInt(matches[2]);
+        return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
     }
 
     // 工具：Hex 转 RGBA

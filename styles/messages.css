@@ -32,7 +32,8 @@
     transform: translateY(20px);
     animation: messageAppear var(--transition-normal) forwards;
     background-color: var(--bg-glass);
-    backdrop-filter: var(--blur-light);
+    backdrop-filter: var(--msg-blur, var(--blur-light));
+    -webkit-backdrop-filter: var(--msg-blur, var(--blur-light));
     box-shadow: var(--shadow-sm);
     border-radius: var(--radius-lg);
 }
@@ -117,14 +118,14 @@
 /* ===== 消息颜色 ===== */
 .received .message-content {
     background-color: var(--msg-received-bg);
-    border: 2px solid var(--msg-received-border);
-    color: var(--color-text);
+    border: var(--msg-border-width, 2px) solid var(--msg-received-border);
+    color: var(--msg-received-color, var(--color-text));
 }
 
 .sent .message-content {
     background-color: var(--msg-sent-bg);
-    border: 2px solid var(--msg-sent-border);
-    color: var(--color-text);
+    border: var(--msg-border-width, 2px) solid var(--msg-sent-border);
+    color: var(--msg-sent-color, var(--color-text));
 }
 
 .sent .message-time,

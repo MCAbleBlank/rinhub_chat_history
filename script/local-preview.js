@@ -42,19 +42,42 @@ class LocalPreviewManager {
                 
                 // 寻找主json文件
                 let jsonFile = null;
-                for (const relativePath in zip.files) {
-                    if (relativePath.endsWith('.json') && !relativePath.includes('/')) {
-                        jsonFile = zip.files[relativePath];
-                        break;
+                // 优先寻找 history.json
+                if (zip.files['history.json']) {
+                    jsonFile = zip.files['history.json'];
+                } else {
+                    // 如果没有 history.json，寻找第一个包含 messages 的 json
+                    for (const relativePath in zip.files) {
+                        if (relativePath.endsWith('.json') && !relativePath.includes('/') && relativePath !== 'settings.json' && relativePath !== 'list.json') {
+                            jsonFile = zip.files[relativePath];
+                            break;
+                        }
                     }
                 }
 
                 if (!jsonFile) {
-                    throw new Error("在压缩包根目录未找到 .json 文件！请确保该文件在第一层级内。");
+                    throw new Error("在压缩包根目录未找到聊天记录文件 (history.json)！");
                 }
 
                 const jsonContent = await jsonFile.async('string');
                 const chatData = JSON.parse(jsonContent);
+
+                if (!chatData || !chatData.participants || !chatData.messages) {
+                    throw new Error("聊天记录文件格式不正确，缺少必要的参与者或消息数据。");
+                }
+
+                // 寻找独立的 settings.json 文件
+                let settingsJson = null;
+                const settingsFile = zip.files['settings.json'];
+                if (settingsFile) {
+                    try {
+                        const settingsContent = await settingsFile.async('string');
+                        settingsJson = JSON.parse(settingsContent);
+                        chatData.settings = settingsJson; // 存入 chatData 供统一处理
+                    } catch (e) {
+                        console.warn("解析 settings.json 失败:", e);
+                    }
+                }
 
                 // 解析压缩包内的所有图片资源，创建 Blob URL
                 const resourceRegex = /\.(png|jpg|jpeg|gif|webp)$/i;
@@ -82,6 +105,15 @@ class LocalPreviewManager {
 
                 // 替换 JSON 数据中的相关资源路径为 Blob URL
                 this.replacePathsWithBlobs(chatData, pathMap);
+
+                // 允许导入时自动加载设置
+                if (chatData.settings && window.settingsManager) {
+                    window.settingsManager.loadRemoteSettings(chatData.settings);
+                } else if (window.settingsManager) {
+                    // 如果导入的没有设置，则恢复默认或保持现状？
+                    // 按照需求，退出预览或切换时应该还原，所以这里如果加载了新的不带设置的，确保之前的被还原
+                    window.settingsManager.restoreOriginalSettings();
+                }
 
                 // 转交给 ChatController 统一渲染
                 ChatController.loadChatData(chatData, '本地ZIP: ' + file.name);

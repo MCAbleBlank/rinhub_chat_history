@@ -23,6 +23,18 @@ class EditorController {
             document.getElementById('menuIcon')?.classList.remove('active');
             document.getElementById('sideMenu')?.classList.remove('active');
         });
+
+        const btnEditCurrent = document.getElementById('btnEditCurrent');
+        if (btnEditCurrent) {
+            btnEditCurrent.addEventListener('click', () => {
+                if (state.currentChatHistory) {
+                    this.loadChatData(state.currentChatHistory);
+                    // 关闭侧边栏
+                    document.getElementById('menuIcon')?.classList.remove('active');
+                    document.getElementById('sideMenu')?.classList.remove('active');
+                }
+            });
+        }
     }
 
     static resetState() {
@@ -40,16 +52,16 @@ class EditorController {
 
     static openEditor() {
         this.resetState();
-        
+
         // 隐藏原有的聊天记录界面
         document.getElementById('chatMessages').style.display = 'none';
-        
+
         const container = document.getElementById('editorContainer');
         container.style.display = 'flex';
-        
+
         // 更新顶栏
         ViewRenderer.updateHeader('编辑器模式', '正在编辑新的聊天记录 (未保存)');
-        
+
         this.render();
     }
 
@@ -57,12 +69,104 @@ class EditorController {
         if (!confirm('确定退出编辑器吗？未保存的内容将丢失。')) return;
         document.getElementById('editorContainer').style.display = 'none';
         document.getElementById('chatMessages').style.display = 'block';
+
+        // 如果是从预览进入的，且有备份设置，尝试恢复
+        if (window.settingsManager) {
+            window.settingsManager.restoreOriginalSettings();
+        }
+
         ViewRenderer.showInitialPrompt();
+    }
+
+    /**
+     * 加载现有的聊天数据到编辑器
+     */
+    static async loadChatData(chatData) {
+        this.resetState();
+        this.state.title = chatData.title || '未命名聊天';
+        this.state.date = chatData.date || '';
+        this.state.participants = [];
+        this.state.messages = [];
+
+        // 加载参与者
+        if (chatData.participants) {
+            for (const [id, p] of Object.entries(chatData.participants)) {
+                let avatarBlobUrl = p.avatar || null;
+                let avatarFile = null;
+
+                if (avatarBlobUrl && avatarBlobUrl.startsWith('blob:')) {
+                    try {
+                        const response = await fetch(avatarBlobUrl);
+                        const blob = await response.blob();
+                        avatarFile = new File([blob], `avatar_${id}.png`, { type: blob.type });
+                    } catch (e) {
+                        console.warn("Failed to convert blob back to file", e);
+                    }
+                }
+
+                this.state.participants.push({
+                    id: id,
+                    nick_name: p.nick_name,
+                    avatarFile: avatarFile,
+                    avatarBlobUrl: avatarBlobUrl
+                });
+            }
+        }
+
+        // 加载消息
+        if (chatData.messages) {
+            for (const msg of chatData.messages) {
+                let type = 'text';
+                let content = '';
+                let fileBlobUrl = null;
+                let fileObj = null;
+
+                if (msg.content.image) {
+                    type = 'image';
+                    content = msg.content.image;
+                } else if (msg.content.sticker) {
+                    type = 'sticker';
+                    content = msg.content.sticker;
+                } else {
+                    type = 'text';
+                    content = msg.content.text || '';
+                }
+
+                if ((type === 'image' || type === 'sticker') && content.startsWith('blob:')) {
+                    fileBlobUrl = content;
+                    try {
+                        const response = await fetch(fileBlobUrl);
+                        const blob = await response.blob();
+                        fileObj = new File([blob], `msg_file_${msg.id}.png`, { type: blob.type });
+                    } catch (e) {
+                        console.warn("Failed to convert msg blob back to file", e);
+                    }
+                }
+
+                this.state.messages.push({
+                    id: msg.id,
+                    senderId: msg.sender,
+                    type: type,
+                    textContent: type === 'text' ? content : '',
+                    fileObj: fileObj,
+                    fileBlobUrl: fileBlobUrl,
+                    quote: msg.content.quote || '',
+                    time: msg.time
+                });
+            }
+        }
+
+        // 切换视图
+        document.getElementById('chatMessages').style.display = 'none';
+        const container = document.getElementById('editorContainer');
+        container.style.display = 'flex';
+        ViewRenderer.updateHeader('编辑器模式 (从导入加载)', '正在编辑导入的聊天记录');
+        this.render();
     }
 
     static render() {
         const container = document.getElementById('editorContainer');
-        
+
         container.innerHTML = `
             <div class="editor-section">
                 <div class="editor-title">
@@ -105,7 +209,13 @@ class EditorController {
             </div>
 
             <div class="editor-bottom-bar">
-                <button class="editor-btn secondary" onclick="EditorController.addMessage()">+ 继续添加消息</button>
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <button class="editor-btn secondary" onclick="EditorController.addMessage()">+ 继续添加消息</button>
+                    <label class="editor-checkbox-btn">
+                        <input type="checkbox" id="includeSettings" checked>
+                        附主题
+                    </label>
+                </div>
                 <button class="editor-btn" onclick="EditorController.exportZip()">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                     保存并导出 ZIP
@@ -148,18 +258,18 @@ class EditorController {
     static renderParticipants() {
         const list = document.getElementById('participantsList');
         list.innerHTML = '';
-        
+
         this.state.participants.forEach((p, index) => {
             const item = document.createElement('div');
             item.className = 'participant-item';
-            
+
             const avatarHtml = `
                 <label class="avatar-upload ${p.avatarBlobUrl ? 'has-image' : ''}">
                     <input type="file" accept="image/*" onchange="EditorController.updateParticipantAvatar('${p.id}', this.files[0])">
-                    ${p.avatarBlobUrl 
-                        ? `<img src="${p.avatarBlobUrl}">` 
-                        : `<span class="upload-placeholder">传头像</span>`
-                    }
+                    ${p.avatarBlobUrl
+                    ? `<img src="${p.avatarBlobUrl}">`
+                    : `<div class="avatar-text">${(p.nick_name || '?').charAt(0).toUpperCase()}</div>`
+                }
                 </label>
             `;
 
@@ -201,7 +311,7 @@ class EditorController {
     static addMessage() {
         const now = new Date();
         const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
-        
+
         const senderId = this.state.participants[0]?.id || '';
 
         this.state.messages.push({
@@ -215,7 +325,7 @@ class EditorController {
             time: timeStr
         });
         this.renderMessages();
-        
+
         // 自动滚动到底部
         setTimeout(() => {
             const container = document.getElementById('editorContainer');
@@ -254,7 +364,7 @@ class EditorController {
     static renderMessages() {
         const list = document.getElementById('messagesList');
         if (!list) return; // 由于重新渲染 participants 可能会触发
-        
+
         list.innerHTML = '';
 
         if (this.state.messages.length === 0) {
@@ -262,20 +372,20 @@ class EditorController {
             return;
         }
 
-        const participantOptionsHtml = this.state.participants.map(p => 
+        const participantOptionsHtml = this.state.participants.map(p =>
             `<option value="${p.id}">${p.nick_name}</option>`
         ).join('');
 
         this.state.messages.forEach((msg, index) => {
             const item = document.createElement('div');
             item.className = 'message-edit-item';
-            
+
             // 构造可选引用ID，只能引用当前消息之前的消息
             let quoteOptionsHtml = '<option value="">(无引用)</option>';
-            for(let i=0; i<index; i++) {
+            for (let i = 0; i < index; i++) {
                 const prevMsg = this.state.messages[i];
                 let displayTxt = prevMsg.type === 'text' ? prevMsg.textContent.substring(0, 10) : `[${prevMsg.type}]`;
-                quoteOptionsHtml += `<option value="${prevMsg.id}">引用 #${i+1}: ${displayTxt}</option>`;
+                quoteOptionsHtml += `<option value="${prevMsg.id}">引用 #${i + 1}: ${displayTxt}</option>`;
             }
 
             // 动态构建内容输入区
@@ -329,15 +439,15 @@ class EditorController {
                     <div class="editor-input-group">
                         <label>消息内容类</label>
                         <div class="message-type-selector">
-                            <button class="message-type-btn ${msg.type==='text'?'active':''}" onclick="EditorController.updateMessageValue('${msg.id}', 'type', 'text')">文字</button>
-                            <button class="message-type-btn ${msg.type==='image'?'active':''}" onclick="EditorController.updateMessageValue('${msg.id}', 'type', 'image')">图片</button>
-                            <button class="message-type-btn ${msg.type==='sticker'?'active':''}" onclick="EditorController.updateMessageValue('${msg.id}', 'type', 'sticker')">表情包 (Sticker)</button>
+                            <button class="message-type-btn ${msg.type === 'text' ? 'active' : ''}" onclick="EditorController.updateMessageValue('${msg.id}', 'type', 'text')">文字</button>
+                            <button class="message-type-btn ${msg.type === 'image' ? 'active' : ''}" onclick="EditorController.updateMessageValue('${msg.id}', 'type', 'image')">图片</button>
+                            <button class="message-type-btn ${msg.type === 'sticker' ? 'active' : ''}" onclick="EditorController.updateMessageValue('${msg.id}', 'type', 'sticker')">表情包 (Sticker)</button>
                         </div>
                         ${contentHtml}
                     </div>
                 </div>
             `;
-            
+
             // 补偿下拉框的选中值
             setTimeout(() => {
                 const selects = item.querySelectorAll('select');
@@ -383,6 +493,14 @@ class EditorController {
                 }
 
                 exportJson.participants[p.id] = partObj;
+            }
+
+            // 附加当前设置
+            const includeSettings = document.getElementById('includeSettings')?.checked;
+            if (includeSettings && window.settingsManager) {
+                const settings = window.settingsManager.settings;
+                exportJson.settings = settings; // 存入 JSON (旧版兼容)
+                zip.file("settings.json", JSON.stringify(settings, null, 4)); // 独立文件
             }
 
             // 提取 Messages && 内容资源
@@ -431,7 +549,7 @@ class EditorController {
             btn.disabled = true;
 
             const blob = await zip.generateAsync({ type: "blob" });
-            
+
             // 构造动态文件名：[标题]-[日期].zip
             const rawFileName = `${this.state.title}_${this.state.date}`;
             const cleanFileName = rawFileName.replace(/[\\/:*?"<>|]/g, '_').trim();
